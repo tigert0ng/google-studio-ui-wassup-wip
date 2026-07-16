@@ -6,7 +6,7 @@ This design system is implemented in React using **Tailwind CSS v4** and customi
 
 ---
 
-## 1. Core Brand Mood & Aesthetic Concept.
+## 1. Core Brand Mood & Aesthetic Concept
 
 The Wassup brand aesthetic is defined as **"Cyber-Organic Premium"** or **"Eco-Tech Prestige"**. It relies on high contrast and sophisticated organic tones, punctuated by high-visibility energy accents to guide user attention.
 
