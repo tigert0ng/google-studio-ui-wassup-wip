@@ -20,6 +20,8 @@ export interface WorkOrder {
   completedAt?: string;
   createdAt: string;
   etaExtensionRequest?: EtaExtensionRequest | null;
+  lastChannel?: 'web' | 'telegram' | 'system';
+  notes?: string;
 }
 
 export interface WorkOrderEvent {

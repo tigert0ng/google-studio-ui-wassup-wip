@@ -251,6 +251,8 @@ export function getMergedOrderStatusView(): OrderStatusView[] {
       completedAt: wo.completedAt,
       createdAt: wo.createdAt,
       etaExtensionRequest: wo.etaExtensionRequest || null,
+      lastChannel: wo.lastChannel || 'web',
+      notes: wo.notes,
       customerId: o.customerId,
       customerName: cust ? cust.name : "Khách vãng lai",
       customerPhone: cust ? cust.phone : undefined,
@@ -476,6 +478,8 @@ export const simActions = {
     discount: number;
     total: number;
     boothId?: string;
+    estimatedDuration?: number;
+    notes?: string;
   }) => {
     let customerId = undefined;
     if (data.customerPhone) {
@@ -518,7 +522,8 @@ export const simActions = {
       technicianId: data.boothId ? currentState.staff.find(s => s.role === 'technician')?.id || null : null,
       boothId: data.boothId || null,
       reworkCount: 0,
-      estimatedDuration: 30,
+      estimatedDuration: data.estimatedDuration || 30,
+      notes: data.notes || null,
       startedAt: null,
       completedAt: null,
       createdAt: new Date().toISOString()
@@ -602,10 +607,113 @@ export const simActions = {
     return false;
   },
 
+  rejectWorkOrder: (woId: string) => {
+    const wo = currentState.workOrders.find(w => w.id === woId);
+    if (wo) {
+      const oldBoothId = wo.boothId;
+      wo.technicianId = null;
+      wo.boothId = null;
+      wo.status = 'queued';
+      
+      if (oldBoothId) {
+        const remainingActive = currentState.workOrders.some(w => w.boothId === oldBoothId && w.id !== woId && w.status !== 'done');
+        if (!remainingActive) {
+          const oldB = currentState.booths.find(b => b.id === oldBoothId);
+          if (oldB) oldB.status = 'idle';
+        }
+      }
+      
+      saveState();
+
+      if (isRealSupabase && supabase) {
+        (async () => {
+          try {
+            await supabase
+              .from("work_orders")
+              .update({
+                technician_id: null,
+                booth_id: null,
+                status: 'queued'
+              })
+              .eq("id", woId);
+            
+            if (oldBoothId) {
+              const remainingActive = currentState.workOrders.some(w => w.boothId === oldBoothId && w.id !== woId && w.status !== 'done');
+              if (!remainingActive) {
+                await supabase
+                  .from("booths")
+                  .update({ status: 'idle' })
+                  .eq("id", oldBoothId);
+              }
+            }
+          } catch (err) {
+            console.error("Error in Supabase rejectWorkOrder:", err);
+          }
+        })();
+      }
+      return true;
+    }
+    return false;
+  },
+
+  moveWorkOrderBooth: (woId: string, targetBoothId: string) => {
+    const wo = currentState.workOrders.find(w => w.id === woId);
+    if (wo) {
+      const oldBoothId = wo.boothId;
+      wo.boothId = targetBoothId;
+      
+      // Update booth statuses
+      const targetB = currentState.booths.find(b => b.id === targetBoothId);
+      if (targetB) targetB.status = 'busy';
+      
+      if (oldBoothId && oldBoothId !== targetBoothId) {
+        // Check if there are other active work orders in the old booth
+        const remainingActive = currentState.workOrders.some(w => w.boothId === oldBoothId && w.id !== woId && w.status !== 'done');
+        if (!remainingActive) {
+          const oldB = currentState.booths.find(b => b.id === oldBoothId);
+          if (oldB) oldB.status = 'idle';
+        }
+      }
+      
+      saveState();
+      
+      if (isRealSupabase && supabase) {
+        (async () => {
+          try {
+            await supabase
+              .from("work_orders")
+              .update({ booth_id: targetBoothId })
+              .eq("id", woId);
+            
+            await supabase
+              .from("booths")
+              .update({ status: 'busy' })
+              .eq("id", targetBoothId);
+              
+            if (oldBoothId && oldBoothId !== targetBoothId) {
+              const remainingActive = currentState.workOrders.some(w => w.boothId === oldBoothId && w.id !== woId && w.status !== 'done');
+              if (!remainingActive) {
+                await supabase
+                  .from("booths")
+                  .update({ status: 'idle' })
+                  .eq("id", oldBoothId);
+              }
+            }
+          } catch (err) {
+            console.error("Error in Supabase moveWorkOrderBooth:", err);
+          }
+        })();
+      }
+      return true;
+    }
+    return false;
+  },
+
   updateWorkOrderStatus: (woId: string, status: WoStatus, actorId?: string, channel: 'web' | 'telegram' | 'system' = 'web', notes?: string) => {
     const wo = currentState.workOrders.find(w => w.id === woId);
     if (wo) {
       wo.status = status;
+      wo.lastChannel = channel;
       if (status === 'in_progress' && !wo.startedAt) {
         wo.startedAt = new Date().toISOString();
       }
