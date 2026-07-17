@@ -666,7 +666,7 @@ export default function KioskStepsManager() {
 
                       <div className="pt-3 border-t border-stone-100 w-full flex items-baseline justify-between mt-4">
                         <span className="text-[10px] text-slate-445 font-sans uppercase font-bold">Giá gói</span>
-                        <span className="font-display font-black text-slate-950 text-base">
+                        <span className="font-sans font-bold text-slate-950 text-lg">
                           {actualPriceVal.toLocaleString("vi-VN")}đ
                         </span>
                       </div>
@@ -687,7 +687,7 @@ export default function KioskStepsManager() {
                 <div className="flex items-center gap-5">
                   <div className="text-right hidden sm:block">
                     <span className="text-[10px] text-slate-450 uppercase tracking-widest font-bold">Gói đã chọn</span>
-                    <span className="text-base font-display font-black text-slate-900 block leading-none mt-1">
+                    <span className="text-lg font-sans font-bold text-slate-900 block leading-none mt-1">
                       {packagePrice.toLocaleString("vi-VN")}đ
                     </span>
                   </div>
@@ -755,7 +755,7 @@ export default function KioskStepsManager() {
                         <h3 className="font-sans font-bold text-slate-800 text-xs leading-tight">
                           {addon.name}
                         </h3>
-                        <span className="font-mono font-black text-slate-950 text-xs block">
+                        <span className="font-sans font-bold text-slate-950 text-sm block">
                           {addon.price.toLocaleString("vi-VN")}đ
                         </span>
                       </div>
@@ -784,7 +784,7 @@ export default function KioskStepsManager() {
                 <div className="flex items-center gap-5">
                   <div className="text-right hidden sm:block">
                     <span className="text-[10px] text-slate-450 uppercase tracking-widest font-bold">Tổng tạm tính</span>
-                    <span className="text-base font-display font-black text-slate-900 block leading-none mt-1">
+                    <span className="text-lg font-sans font-bold text-slate-900 block leading-none mt-1">
                       {subtotal.toLocaleString("vi-VN")}đ
                     </span>
                   </div>
@@ -855,7 +855,7 @@ export default function KioskStepsManager() {
                       <div className="flex justify-between items-center bg-amber-50 text-amber-800 text-xs font-bold p-3 rounded-xl border border-amber-200 animate-fadeIn">
                         <span>🏷️ Mã áp dụng: {state.appliedPromoName}</span>
                         <div className="flex items-center gap-2">
-                          <span className="font-black text-amber-900">-{state.appliedDiscount.toLocaleString("vi-VN")}đ</span>
+                          <span className="font-sans font-bold text-amber-900">-{state.appliedDiscount.toLocaleString("vi-VN")}đ</span>
                           <button
                             type="button"
                             onClick={() => {
@@ -887,24 +887,24 @@ export default function KioskStepsManager() {
                     <span className="text-[10px] font-black text-slate-450 tracking-wider uppercase block">CHI TIẾT GIÁ TRỊ</span>
                     
                     <div className="text-xs space-y-2 font-sans">
-                      <div className="flex justify-between text-slate-600">
+                      <div className="flex justify-between text-slate-600 font-medium">
                         <span>Gói chính ({selectedPackage.code}):</span>
-                        <span className="font-bold">{packagePrice.toLocaleString("vi-VN")}đ</span>
+                        <span className="font-sans font-bold text-slate-700">{packagePrice.toLocaleString("vi-VN")}đ</span>
                       </div>
-                      <div className="flex justify-between text-slate-600">
+                      <div className="flex justify-between text-slate-600 font-medium">
                         <span>Dịch vụ thêm ({state.selectedAddonIds.length} món):</span>
-                        <span className="font-bold">+{addonsTotal.toLocaleString("vi-VN")}đ</span>
+                        <span className="font-sans font-bold text-slate-700">+{addonsTotal.toLocaleString("vi-VN")}đ</span>
                       </div>
                       {state.appliedDiscount > 0 && (
                         <div className="flex justify-between text-red-600 font-bold">
                           <span>Chiết khấu mã giảm:</span>
-                          <span>-{state.appliedDiscount.toLocaleString("vi-VN")}đ</span>
+                          <span className="font-sans font-bold">-{state.appliedDiscount.toLocaleString("vi-VN")}đ</span>
                         </div>
                       )}
                       
                       <div className="border-t border-stone-200 pt-2.5 flex justify-between items-baseline text-slate-900 font-black">
                         <span>THÀNH TIỀN:</span>
-                        <span className="text-lg font-display text-forest-green">
+                        <span className="text-xl font-sans font-bold text-forest-green" style={{ color: "#559119" }}>
                           {finalTotal.toLocaleString("vi-VN")}đ
                         </span>
                       </div>
@@ -970,14 +970,14 @@ export default function KioskStepsManager() {
                             ({state.segment === 'sedan' ? "4-5 Chỗ" : "7-9 Chỗ"})
                           </span>
                         </div>
-                        <span className="font-mono font-black text-slate-900">{packagePrice.toLocaleString("vi-VN")}đ</span>
+                        <span className="font-sans font-bold text-slate-900 text-sm">{packagePrice.toLocaleString("vi-VN")}đ</span>
                       </div>
 
                       {/* Addon cost */}
                       {KIOSK_ADDONS.filter(a => state.selectedAddonIds.includes(a.id)).map((addon) => (
                         <div key={addon.id} className="flex justify-between items-center text-xs text-slate-650 pl-3 border-l-2 border-[#A2C62C]">
                           <span className="text-slate-500 font-sans">Addon: {addon.name}</span>
-                          <span className="font-mono font-black text-slate-900">+{addon.price.toLocaleString("vi-VN")}đ</span>
+                          <span className="font-sans font-bold text-slate-900 text-sm">+{addon.price.toLocaleString("vi-VN")}đ</span>
                         </div>
                       ))}
 
@@ -985,14 +985,14 @@ export default function KioskStepsManager() {
                       {state.appliedDiscount > 0 && (
                         <div className="flex justify-between items-center text-xs text-red-600 font-bold bg-red-50/50 p-2 rounded-lg border border-red-100">
                           <span>Khuyến mãi ({state.appliedPromoName}):</span>
-                          <span>-{state.appliedDiscount.toLocaleString("vi-VN")}đ</span>
+                          <span className="font-sans font-bold">-{state.appliedDiscount.toLocaleString("vi-VN")}đ</span>
                         </div>
                       )}
                     </div>
 
                     <div className="flex justify-between items-center pt-2">
                       <span className="text-xs font-display font-black text-slate-800 uppercase">TỔNG THANH TOÁN (VND):</span>
-                      <span className="text-2xl font-display font-black text-[#A2C62C] drop-shadow-sm">
+                      <span className="text-3xl font-sans font-bold text-[#A2C62C] drop-shadow-sm">
                         {finalTotal.toLocaleString("vi-VN")}đ
                       </span>
                     </div>

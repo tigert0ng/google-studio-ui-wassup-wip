@@ -243,6 +243,7 @@ export default function ServicesModule() {
   const [editDescription, setEditDescription] = useState("");
   const [editThumbnail, setEditThumbnail] = useState("");
   const [editorTab, setEditorTab] = useState<"write" | "preview" | "bom">("write");
+  const [deleteConfirmCode, setDeleteConfirmCode] = useState("");
 
   const insertFormat = (formatType: string) => {
     const textarea = document.querySelector('form#edit-service-form textarea') as HTMLTextAreaElement;
@@ -375,6 +376,7 @@ export default function ServicesModule() {
     setEditDescription(service.description || "");
     setEditThumbnail(service.thumbnail || "");
     setEditorTab("write"); // default tab
+    setDeleteConfirmCode("");
     
     // Default selection for BOM adding list
     const firstAvailableInv = inventoryList[0]?.id || "";
@@ -673,8 +675,8 @@ export default function ServicesModule() {
     });
   };
 
-  const handleDeleteService = (id: string, type: "package" | "addon") => {
-    if (confirm("Bạn có chắc chắn muốn xóa dịch vụ này khỏi danh mục không?")) {
+  const handleDeleteService = (id: string, type: "package" | "addon", bypassConfirm = false) => {
+    if (bypassConfirm || confirm("Bạn có chắc chắn muốn xóa dịch vụ này khỏi danh mục không?")) {
       if (type === "package") {
         setPackages(packages.filter(p => p.id !== id));
       } else {
@@ -806,9 +808,6 @@ export default function ServicesModule() {
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {packages.map((pkg) => {
-              const isW1 = pkg.id === 'w1' || pkg.colorType === 'primary';
-              const isGold = pkg.id === 'w4' || pkg.id === 'w5' || pkg.colorType === 'gold';
-              
               // BOM validation indicators for high-fidelity PRD requirement
               const bomLines = boms[pkg.id] || [];
               const hasBom = bomLines.length > 0;
@@ -821,7 +820,7 @@ export default function ServicesModule() {
               let durationBadge = "bg-gray-100 text-matte-black";
               let tagStyle = "bg-gray-50 text-slate-700 border-gray-200";
 
-              if (isW1) {
+              if (pkg.colorType === 'primary') {
                 cardBg = "bg-brand-green border-brand-green/30 shadow-lg shadow-brand-green/10";
                 textTitleColor = "text-matte-black font-black";
                 textPriceColor = "text-matte-black";
@@ -829,13 +828,21 @@ export default function ServicesModule() {
                 badgeStyle = "bg-matte-black text-brand-green";
                 durationBadge = "bg-white/40 text-matte-black";
                 tagStyle = "bg-white/30 text-matte-black border-transparent";
-              } else if (isGold) {
+              } else if (pkg.colorType === 'gold') {
                 cardBg = "bg-warm-gold border-amber-600/20 shadow-lg shadow-warm-gold/15";
                 textTitleColor = "text-white font-black";
                 textPriceColor = "text-yellow-100";
                 textDescColor = "text-amber-50/90";
                 badgeStyle = "bg-white text-warm-gold";
                 durationBadge = "bg-white/20 text-white";
+                tagStyle = "bg-white/10 text-white border-transparent";
+              } else if (pkg.colorType === 'custom') {
+                cardBg = "bg-matte-black border-matte-black/30 shadow-lg shadow-black/10 text-white";
+                textTitleColor = "text-brand-green font-black";
+                textPriceColor = "text-white";
+                textDescColor = "text-slate-300";
+                badgeStyle = "bg-brand-green text-matte-black";
+                durationBadge = "bg-white/15 text-white";
                 tagStyle = "bg-white/10 text-white border-transparent";
               }
 
@@ -845,11 +852,14 @@ export default function ServicesModule() {
                   onClick={() => handleOpenEditSidebar(pkg)}
                   className={`p-6 border rounded-2xl cursor-pointer transition-all duration-300 flex flex-col justify-between min-h-[210px] relative group overflow-hidden hover:-translate-y-1 ${cardBg}`}
                 >
-                  {isGold && (
+                  {pkg.colorType === 'gold' && (
                     <div className="absolute -right-10 -top-10 w-32 h-32 bg-white/10 rounded-full blur-2xl group-hover:bg-white/20 transition-all duration-500" />
                   )}
-                  {isW1 && (
+                  {pkg.colorType === 'primary' && (
                     <div className="absolute -right-10 -top-10 w-32 h-32 bg-black/5 rounded-full blur-xl group-hover:bg-black/10 transition-all duration-500" />
+                  )}
+                  {pkg.colorType === 'custom' && (
+                    <div className="absolute -right-10 -top-10 w-32 h-32 bg-white/5 rounded-full blur-xl group-hover:bg-white/10 transition-all duration-500" />
                   )}
 
                   <div>
@@ -879,21 +889,6 @@ export default function ServicesModule() {
                           {pkg.name}
                         </h4>
                       </div>
-                      
-                      <div className="flex items-center gap-1 shrink-0">
-                        <span className={`font-mono text-sm font-black ${textPriceColor}`}>{formatVnd(pkg.price)}</span>
-                        
-                        <button
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            handleDeleteService(pkg.id, "package");
-                          }}
-                          className="opacity-0 group-hover:opacity-100 p-1.5 text-mid-gray hover:text-red-500 transition-opacity rounded-lg hover:bg-black/5 cursor-pointer ml-1"
-                          title="Xóa dịch vụ"
-                        >
-                          <Trash2 className="h-4 w-4" />
-                        </button>
-                      </div>
                     </div>
 
                     <p 
@@ -905,11 +900,9 @@ export default function ServicesModule() {
                   {/* Badges footer */}
                   <div className="mt-4 pt-3 border-t border-black/5 flex flex-wrap justify-between items-center gap-2 relative z-10">
                     <div className="flex items-center gap-1">
-                      {pkg.tags && pkg.tags.slice(0, 2).map((tag, i) => (
-                        <span key={i} className={`text-[9px] font-extrabold px-2 py-0.5 rounded border ${tagStyle}`}>
-                          {tag}
-                        </span>
-                      ))}
+                      <span className={`font-sans font-bold text-lg ${textPriceColor}`}>
+                        {formatVnd(pkg.price)}
+                      </span>
                     </div>
 
                     <div className={`flex items-center gap-1 text-[9px] font-extrabold px-2 py-1 rounded-lg ${durationBadge}`}>
@@ -940,11 +933,37 @@ export default function ServicesModule() {
               const addBomLines = boms[add.id] || [];
               const hasBom = addBomLines.length > 0;
 
+              let cardBg = "bg-white border-gray-200/70 hover:border-gray-300 hover:shadow-lg";
+              let textTitleColor = "text-matte-black group-hover:text-forest-green transition-colors";
+              let textDescColor = "text-mid-gray";
+              let textPriceColor = "text-forest-green";
+              let textDurationColor = "text-mid-gray";
+
+              if (add.colorType === 'primary') {
+                cardBg = "bg-brand-green border-brand-green/30 hover:border-brand-green-dark shadow-md";
+                textTitleColor = "text-matte-black font-black";
+                textDescColor = "text-emerald-950/80";
+                textPriceColor = "text-matte-black";
+                textDurationColor = "text-emerald-950/80";
+              } else if (add.colorType === 'gold') {
+                cardBg = "bg-warm-gold border-amber-600/20 hover:border-amber-600/40 shadow-md";
+                textTitleColor = "text-white font-black";
+                textDescColor = "text-amber-50/90";
+                textPriceColor = "text-white";
+                textDurationColor = "text-amber-100";
+              } else if (add.colorType === 'custom') {
+                cardBg = "bg-matte-black border-matte-black/30 hover:border-neutral-800 shadow-md text-white";
+                textTitleColor = "text-brand-green font-black";
+                textDescColor = "text-slate-300";
+                textPriceColor = "text-white";
+                textDurationColor = "text-slate-400";
+              }
+
               return (
                 <div
                   key={add.id}
                   onClick={() => handleOpenEditSidebar(add)}
-                  className="group cursor-pointer bg-white border border-gray-200/70 rounded-2xl p-4 flex flex-col justify-between hover:shadow-lg hover:border-gray-300 transition-all duration-300 hover:-translate-y-1"
+                  className={`group cursor-pointer rounded-2xl p-4 flex flex-col justify-between transition-all duration-300 hover:-translate-y-1 ${cardBg}`}
                 >
                   <div>
                     {/* Thumbnail Ratio 1:1 image container */}
@@ -988,22 +1007,22 @@ export default function ServicesModule() {
                       </div>
                     </div>
 
-                    <h4 className="font-display font-black text-xs text-matte-black group-hover:text-forest-green transition-colors leading-snug line-clamp-2">
+                    <h4 className={`font-display font-black text-xs leading-snug line-clamp-2 ${textTitleColor}`}>
                       {add.name}
                     </h4>
                     
                     <p 
-                      className="text-[10px] text-mid-gray mt-1 font-sans line-clamp-2 leading-relaxed"
+                      className={`text-[10px] mt-1 font-sans line-clamp-2 leading-relaxed ${textDescColor}`}
                       dangerouslySetInnerHTML={{ __html: renderRichText(add.description || "Dịch vụ thi công lẻ tăng hiệu năng bảo quản xế yêu.") }}
                     />
                   </div>
 
-                  <div className="mt-4 pt-3.5 border-t border-gray-100 flex items-center justify-between gap-1">
-                    <span className="font-mono text-xs font-black text-forest-green bg-brand-green-light/60 px-2.5 py-1 rounded-lg">
+                  <div className="mt-4 pt-3.5 border-t border-gray-100/30 flex items-center justify-between gap-1">
+                    <span className={`font-sans font-bold text-base ${textPriceColor}`}>
                       {formatVnd(add.price)}
                     </span>
                     
-                    <span className="text-[9px] text-mid-gray font-extrabold flex items-center gap-0.5 font-mono">
+                    <span className={`text-[9px] font-extrabold flex items-center gap-0.5 font-sans ${textDurationColor}`}>
                       <Clock className="h-3 w-3" /> {add.duration || 15}m
                     </span>
                   </div>
@@ -1216,18 +1235,7 @@ export default function ServicesModule() {
                       </div>
                     </div>
 
-                    <div className="space-y-1.5">
-                      <label className="text-[10px] font-sans text-mid-gray uppercase font-extrabold block flex items-center gap-1">
-                        <Tag className="h-3.5 w-3.5" /> Thẻ phân loại (Cách nhau bởi dấu phẩy)
-                      </label>
-                      <input
-                        type="text"
-                        placeholder="Ví dụ: Phổ biến, Chuyên sâu, Nano"
-                        value={editTags}
-                        onChange={(e) => setEditTags(e.target.value)}
-                        className="w-full bg-white border border-[#e5e5e5] rounded-xl px-3 py-2.5 text-xs text-matte-black focus:outline-none focus:border-forest-green"
-                      />
-                    </div>
+
 
                     <div className="space-y-1.5">
                       <div className="flex justify-between items-center mb-1">
@@ -1438,40 +1446,76 @@ export default function ServicesModule() {
                   </div>
                 )}
 
+                {/* SECTION: AUDIT/ADJUSTMENT HISTORY & DANGER ZONE INSIDE SCROLLABLE AREA */}
+                <div className="pt-6 mt-6 border-t border-gray-100 space-y-4">
+                  <div className="flex items-center gap-2 text-matte-black font-display font-black text-[11px] uppercase tracking-wider pb-1 border-b border-gray-250">
+                    <History className="h-4 w-4 text-purple-600 animate-spin" style={{ animationDuration: '6s' }} />
+                    LỊCH SỬ BIẾN ĐỘNG HỒ SƠ DỊCH VỤ
+                  </div>
+
+                  <div className="space-y-1.5 max-h-40 overflow-y-auto pr-1">
+                    {adjustmentHistory.filter(h => h.serviceId === selectedService.id).length === 0 ? (
+                      <div className="text-[10px] text-mid-gray text-center py-2 italic font-sans">
+                        Chưa ghi nhận biến động dữ liệu cho gói này.
+                      </div>
+                    ) : (
+                      adjustmentHistory
+                        .filter(h => h.serviceId === selectedService.id)
+                        .slice(0, 5)
+                        .map((log) => (
+                          <div key={log.id} className="text-[10px] font-sans flex flex-col gap-0.5 bg-white p-2 rounded-lg border border-gray-100 shadow-xs">
+                            <div className="flex justify-between items-center text-[9px] text-mid-gray">
+                              <span className="font-semibold text-slate-700">{log.updatedBy}</span>
+                              <span>{new Date(log.timestamp).toLocaleString("vi-VN", { hour: '2-digit', minute: '2-digit', day: '2-digit', month: '2-digit' })}</span>
+                            </div>
+                            <div className="text-matte-black text-[10px] leading-tight">
+                              Thay đổi <strong className="text-slate-800">{log.fieldChanged}</strong>: <span className="line-through text-red-500">{log.oldValue}</span> → <strong className="text-forest-green">{log.newValue}</strong>
+                            </div>
+                          </div>
+                        ))
+                    )}
+                  </div>
+
+                  {/* Delete service warning block */}
+                  <div className="p-3 bg-red-50 border border-red-200 rounded-xl space-y-2">
+                    <div className="flex items-center gap-1 text-red-700 font-extrabold uppercase text-[10px] tracking-wider">
+                      <AlertTriangle className="h-4 w-4 text-red-500 shrink-0" />
+                      VÙNG NGUY HIỂM: XÓA DỊCH VỤ
+                    </div>
+                    <p className="text-[10px] text-red-650 leading-relaxed font-sans">
+                      Vui lòng nhập mã gói <strong className="font-mono text-red-900 bg-red-100 px-1 py-0.5 rounded">{selectedService.code}</strong> để xác nhận xóa vĩnh viễn dịch vụ này.
+                    </p>
+                    <div className="flex gap-2">
+                      <input
+                        type="text"
+                        placeholder="Nhập mã gói..."
+                        value={deleteConfirmCode}
+                        onChange={(e) => setDeleteConfirmCode(e.target.value)}
+                        className="flex-1 bg-white border border-red-200 rounded-lg px-2.5 py-1.5 text-xs font-mono font-bold text-matte-black uppercase focus:outline-none focus:border-red-500 shadow-sm"
+                      />
+                      <button
+                        type="button"
+                        disabled={deleteConfirmCode.trim().toUpperCase() !== selectedService.code.toUpperCase()}
+                        onClick={() => {
+                          handleDeleteService(selectedService.id, selectedService.type, true);
+                          setDeleteConfirmCode("");
+                        }}
+                        className="px-4 py-1.5 rounded-lg text-white font-extrabold text-[10px] uppercase tracking-wider transition disabled:bg-gray-200 disabled:text-gray-400 disabled:cursor-not-allowed cursor-pointer flex items-center gap-1 shrink-0"
+                        style={{ backgroundColor: deleteConfirmCode.trim().toUpperCase() === selectedService.code.toUpperCase() ? "#dc2626" : undefined }}
+                      >
+                        <Trash2 className="h-3.5 w-3.5" />
+                        Xóa
+                      </button>
+                    </div>
+                  </div>
+                </div>
+
               </div>
 
-              {/* SECTION: AUDIT/ADJUSTMENT HISTORY AT THE BOTTOM */}
-              <div className="p-6 bg-warm-white border-t border-[#e5e5e5] space-y-3 shrink-0">
-                <div className="flex items-center gap-2 text-matte-black font-display font-black text-[11px] uppercase tracking-wider pb-1 border-b border-gray-200">
-                  <History className="h-4 w-4 text-purple-600 animate-spin" style={{ animationDuration: '6s' }} />
-                  LỊCH SỬ BIẾN ĐỘNG HỒ SƠ DỊCH VỤ
-                </div>
-
-                <div className="space-y-1.5 max-h-28 overflow-y-auto pr-1">
-                  {adjustmentHistory.filter(h => h.serviceId === selectedService.id).length === 0 ? (
-                    <div className="text-[10px] text-mid-gray text-center py-2 italic font-sans">
-                      Chưa ghi nhận biến động dữ liệu cho gói này.
-                    </div>
-                  ) : (
-                    adjustmentHistory
-                      .filter(h => h.serviceId === selectedService.id)
-                      .slice(0, 5)
-                      .map((log) => (
-                        <div key={log.id} className="text-[10px] font-sans flex flex-col gap-0.5 bg-white p-2 rounded-lg border border-gray-100 shadow-xs">
-                          <div className="flex justify-between items-center text-[9px] text-mid-gray">
-                            <span className="font-semibold text-slate-700">{log.updatedBy}</span>
-                            <span>{new Date(log.timestamp).toLocaleString("vi-VN", { hour: '2-digit', minute: '2-digit', day: '2-digit', month: '2-digit' })}</span>
-                          </div>
-                          <div className="text-matte-black text-[10px] leading-tight">
-                            Thay đổi <strong className="text-slate-800">{log.fieldChanged}</strong>: <span className="line-through text-red-500">{log.oldValue}</span> → <strong className="text-forest-green">{log.newValue}</strong>
-                          </div>
-                        </div>
-                      ))
-                  )}
-                </div>
-
+              {/* SECTION: STICKY SUBMIT BUTTONS AT THE BOTTOM */}
+              <div className="p-6 bg-warm-white border-t border-[#e5e5e5] shrink-0">
                 {/* Submit Action buttons */}
-                <div className="flex gap-3 pt-3">
+                <div className="flex gap-3">
                   <button
                     type="button"
                     onClick={() => setIsSidebarOpen(false)}
