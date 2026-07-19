@@ -64,12 +64,13 @@ Wassup utilizes three distinct font families to build semantic structure and typ
     ```
 
 ### 3.3. Monospace Font: **JetBrains Mono** (`font-mono`)
-*   **Role:** Ticket IDs, license plates, timestamps, live IoT coordinates, sensor telemetry, and financial figures.
+*   **Role:** Raw hexadecimal console outputs, internal database UUID keys, sensor telemetry error flags, and specific system configurations (e.g. barcode raw read logs).
 *   **Characteristics:** Clear character distinction (e.g. `O` vs `0`), giving a technical, highly accurate "live telemetry" vibe.
+*   **Font Hygiene & Mono-Reduction Rule:** Monospace `font-mono` must NOT be overused on general user-facing or operator data such as standard timestamps, regular license plates, S3 buckets, user PIN codes, audit log lists, or general metadata. Excessive monospace typography causes severe visual noise and clutter ("tech-larping / AI-slop"). Clean, proportional `font-sans` (Inter) must be used instead for license plates, dates, numbers, general configuration input fields, and descriptions to ensure pristine readability and editorial contrast.
 *   **Usage Example:**
     ```tsx
-    <span className="font-mono text-xs font-semibold tracking-wider text-amber-500">
-      ID: ORD-72810
+    <span className="font-mono text-[10px] text-rose-600 bg-stone-100 px-1 py-0.5 rounded">
+      0x7f03a8c1
     </span>
     ```
 
@@ -130,6 +131,25 @@ Status indicators must always use standard semantic pairings with clear typograp
 Interactive text links for administrative/CRM tasks inside user detail sheets (such as **Đăng ký thêm xe** and **Cấp voucher thủ công**) must be styled in high-contrast matte-black rather than the primary bright brand green to prevent color-contrast pollution and visual fatigue:
 *   **Class Specs:** `text-[#1a1a1a] hover:text-[#1a1a1a]/80 font-extrabold uppercase text-[10px] flex items-center gap-1 cursor-pointer transition font-sans`
 
+### 5.5. Rich Markdown Text Subsystem
+To enable rich textual descriptions across the platform, Wassup includes a custom markdown editing and rendering pipeline.
+*   **Component 1: `MarkdownTextarea`**
+    *   **Role:** Rich content authoring for service packages, checkout notes, customer comments, CRM adjustments, and warehouse ledger logs.
+    *   **Design Specifications:** A custom wrapper nested inside a subtle stone-colored card, accompanied by a formatting toolbar featuring dynamic shortcuts for:
+        *   **Bold (`**text**`)** — Lucide `Bold` icon
+        *   *Italic (`*text*`)* — Lucide `Italic` icon
+        *   <u>Underline (`<u>text</u>`)</u> — Lucide `Underline` icon
+        *   Bullet list (`- item`) — Lucide `List` icon
+    *   **Micro-Interaction:** Highlighting formatting elements and preserving cursor selection coordinates after dynamic insertions.
+*   **Component 2: `MarkdownRenderer`**
+    *   **Role:** Parsing and styling custom-authored content back into safe, high-quality Tailwind components.
+    *   **HTML Mapping & Typography:**
+        *   Paragraphs styled as `text-xs text-stone-600 leading-relaxed`
+        *   Bullet lists parsed as `list-disc pl-4 text-stone-600 space-y-0.5`
+        *   Inline strong elements (`**...**`) highlighted via `font-extrabold text-stone-900`
+        *   Underlined content styled with customized text decoration: `underline decoration-stone-400`
+        *   Code blocks with backticks (`` `...` ``) styled in inline code snippets: `bg-stone-100 text-rose-600 px-1 py-0.5 rounded text-[10px]`
+
 ---
 
 ## 6. Motion & Interaction Rules
@@ -162,3 +182,4 @@ Animations must be subtle, intentional, and performant. Standardized transition 
 2.  **No Direct Port references:** The application runs behind a reverse proxy mapping port `3000`. Direct configuration or reading of local port overrides is strictly prohibited.
 3.  **Client-Side Persistence:** Critical local data (role permissions, user logins, simulated service BOM maps) must utilize standard local storage structures with fallback schemas so the app remains resilient to cache resets.
 4.  **No Clutter/Anti-AI Slop:** Never display raw technical telemetry, system coordinates, or container internal states (e.g., "PORT: 3000") in consumer margins unless explicitly asked. Design with clean, honest labels.
+5.  **Rich Formatting Support:** Standardize text entries (such as customer reception comments, inventory transaction reasons, packages, and CRM action notes) with `MarkdownTextarea` and display them via `MarkdownRenderer`. Never use raw unformatted HTML or raw text fields where formatting is beneficial.

@@ -623,7 +623,7 @@ export default function SettingsModule({ rolePermissions, onPermissionsChange }:
                 required
                 value={stationId}
                 onChange={(e) => setStationId(e.target.value.toUpperCase())}
-                className="w-full bg-gray-50 border border-[#e5e5e5] rounded-xl px-3.5 py-2.5 font-bold text-matte-black focus:outline-none focus:border-forest-green"
+                className="w-full bg-gray-50 border border-[#e5e5e5] rounded-xl px-3.5 py-2.5 font-mono font-bold text-matte-black focus:outline-none focus:border-forest-green"
               />
             </div>
             <div className="space-y-1.5 md:col-span-2">
@@ -694,7 +694,7 @@ export default function SettingsModule({ rolePermissions, onPermissionsChange }:
                   required
                   value={openTime}
                   onChange={(e) => setOpenTime(e.target.value)}
-                  className="w-full bg-white border border-[#e5e5e5] rounded-xl px-4 py-2.5 font-bold text-matte-black focus:outline-none focus:border-forest-green"
+                  className="w-full bg-white border border-[#e5e5e5] rounded-xl px-4 py-2.5 font-mono font-bold text-matte-black focus:outline-none focus:border-forest-green"
                 />
               </div>
               <div className="space-y-1.5">
@@ -704,7 +704,7 @@ export default function SettingsModule({ rolePermissions, onPermissionsChange }:
                   required
                   value={closeTime}
                   onChange={(e) => setCloseTime(e.target.value)}
-                  className="w-full bg-white border border-[#e5e5e5] rounded-xl px-4 py-2.5 font-bold text-matte-black focus:outline-none focus:border-forest-green"
+                  className="w-full bg-white border border-[#e5e5e5] rounded-xl px-4 py-2.5 font-mono font-bold text-matte-black focus:outline-none focus:border-forest-green"
                 />
               </div>
             </div>
@@ -757,7 +757,7 @@ export default function SettingsModule({ rolePermissions, onPermissionsChange }:
                           {st.role === "master_admin" ? "Admin" : st.role === "manager" ? "Quản lý" : st.role === "technician" ? "KTV" : "Kế toán"}
                         </span>
                       </div>
-                      <div className="flex items-center gap-3 text-[10px] text-mid-gray">
+                      <div className="flex items-center gap-3 text-[10px] text-mid-gray font-mono">
                         <span>☎️ {st.phone}</span>
                         <span>🔑 PIN: {st.pin || "123456"}</span>
                       </div>
@@ -916,7 +916,7 @@ export default function SettingsModule({ rolePermissions, onPermissionsChange }:
                     type="number"
                     value={dailyTarget}
                     onChange={(e) => setDailyTarget(Number(e.target.value))}
-                    className="w-full bg-white border border-gray-200 rounded-lg px-3 py-2 font-bold text-forest-green"
+                    className="w-full bg-white border border-gray-200 rounded-lg px-3 py-2 font-mono font-bold text-forest-green"
                   />
                 </div>
                 <div className="space-y-1">
@@ -925,7 +925,7 @@ export default function SettingsModule({ rolePermissions, onPermissionsChange }:
                     type="number"
                     value={warningLevel}
                     onChange={(e) => setWarningLevel(Number(e.target.value))}
-                    className="w-full bg-white border border-gray-200 rounded-lg px-3 py-2 font-bold text-amber-600"
+                    className="w-full bg-white border border-gray-200 rounded-lg px-3 py-2 font-mono font-bold text-amber-600"
                   />
                 </div>
                 <div className="space-y-1">
@@ -934,7 +934,7 @@ export default function SettingsModule({ rolePermissions, onPermissionsChange }:
                     type="number"
                     value={redThreshold}
                     onChange={(e) => setRedThreshold(Number(e.target.value))}
-                    className="w-full bg-white border border-gray-200 rounded-lg px-3 py-2 font-bold text-red-600"
+                    className="w-full bg-white border border-gray-200 rounded-lg px-3 py-2 font-mono font-bold text-red-600"
                   />
                 </div>
               </div>
@@ -956,7 +956,7 @@ export default function SettingsModule({ rolePermissions, onPermissionsChange }:
                       type="number"
                       value={surcharges.sedan}
                       onChange={(e) => setSurcharges({ ...surcharges, sedan: Number(e.target.value) })}
-                      className="w-24 bg-white border border-gray-200 rounded-lg px-2.5 py-1 font-bold text-right"
+                      className="w-24 bg-white border border-gray-200 rounded-lg px-2.5 py-1 font-mono font-bold text-right"
                     />
                   </div>
                   <div className="flex items-center justify-between gap-2">
@@ -965,7 +965,7 @@ export default function SettingsModule({ rolePermissions, onPermissionsChange }:
                       type="number"
                       value={surcharges.suv}
                       onChange={(e) => setSurcharges({ ...surcharges, suv: Number(e.target.value) })}
-                      className="w-24 bg-white border border-gray-200 rounded-lg px-2.5 py-1 font-bold text-right"
+                      className="w-24 bg-white border border-gray-200 rounded-lg px-2.5 py-1 font-mono font-bold text-right"
                     />
                   </div>
                   <div className="flex items-center justify-between gap-2">
@@ -974,7 +974,7 @@ export default function SettingsModule({ rolePermissions, onPermissionsChange }:
                       type="number"
                       value={surcharges.luxury}
                       onChange={(e) => setSurcharges({ ...surcharges, luxury: Number(e.target.value) })}
-                      className="w-24 bg-white border border-gray-200 rounded-lg px-2.5 py-1 font-bold text-right"
+                      className="w-24 bg-white border border-gray-200 rounded-lg px-2.5 py-1 font-mono font-bold text-right"
                     />
                   </div>
                   <div className="flex items-center justify-between gap-2">
@@ -983,7 +983,7 @@ export default function SettingsModule({ rolePermissions, onPermissionsChange }:
                       type="number"
                       value={surcharges.electric}
                       onChange={(e) => setSurcharges({ ...surcharges, electric: Number(e.target.value) })}
-                      className="w-24 bg-white border border-gray-200 rounded-lg px-2.5 py-1 font-bold text-right"
+                      className="w-24 bg-white border border-gray-200 rounded-lg px-2.5 py-1 font-mono font-bold text-right"
                     />
                   </div>
                 </div>
@@ -1003,7 +1003,7 @@ export default function SettingsModule({ rolePermissions, onPermissionsChange }:
                       type="number"
                       value={spendingLimits.manager}
                       onChange={(e) => setSpendingLimits({ ...spendingLimits, manager: Number(e.target.value) })}
-                      className="w-28 bg-white border border-gray-200 rounded-lg px-2.5 py-1 font-bold text-right"
+                      className="w-28 bg-white border border-gray-200 rounded-lg px-2.5 py-1 font-mono font-bold text-right"
                     />
                   </div>
                   <div className="flex items-center justify-between gap-2">
@@ -1012,7 +1012,7 @@ export default function SettingsModule({ rolePermissions, onPermissionsChange }:
                       type="number"
                       value={spendingLimits.accountant}
                       onChange={(e) => setSpendingLimits({ ...spendingLimits, accountant: Number(e.target.value) })}
-                      className="w-28 bg-white border border-gray-200 rounded-lg px-2.5 py-1 font-bold text-right"
+                      className="w-28 bg-white border border-gray-200 rounded-lg px-2.5 py-1 font-mono font-bold text-right"
                     />
                   </div>
                   <div className="flex items-center justify-between gap-2">
@@ -1021,7 +1021,7 @@ export default function SettingsModule({ rolePermissions, onPermissionsChange }:
                       type="number"
                       value={spendingLimits.technician}
                       onChange={(e) => setSpendingLimits({ ...spendingLimits, technician: Number(e.target.value) })}
-                      className="w-28 bg-white border border-gray-200 rounded-lg px-2.5 py-1 font-bold text-right"
+                      className="w-28 bg-white border border-gray-200 rounded-lg px-2.5 py-1 font-mono font-bold text-right"
                     />
                   </div>
                 </div>
@@ -1049,7 +1049,7 @@ export default function SettingsModule({ rolePermissions, onPermissionsChange }:
                   type="number"
                   value={lowStockWarning}
                   onChange={(e) => setLowStockWarning(Number(e.target.value))}
-                  className="w-20 bg-white border border-amber-200 rounded-lg px-3 py-1.5 font-bold text-center text-amber-800 focus:outline-none focus:border-amber-500"
+                  className="w-20 bg-white border border-amber-200 rounded-lg px-3 py-1.5 font-mono font-bold text-center text-amber-800 focus:outline-none focus:border-amber-500"
                 />
                 <span className="font-bold text-amber-700">đơn vị</span>
               </div>
@@ -1082,7 +1082,7 @@ export default function SettingsModule({ rolePermissions, onPermissionsChange }:
                 <p className="text-[11px] text-mid-gray font-sans mt-0.5">Tích hợp phần cứng sảnh chờ, máy in nhiệt POS Kiosk và đồng bộ hóa Telegram Bot KTV.</p>
               </div>
 
-              <span className="text-[10px] bg-emerald-50 text-emerald-800 font-bold border border-emerald-100 px-3 py-1 rounded-full uppercase tracking-wider flex items-center gap-1">
+              <span className="text-[10px] bg-emerald-50 text-emerald-800 font-mono font-bold border border-emerald-100 px-3 py-1 rounded-full uppercase tracking-wider flex items-center gap-1">
                 <span className="h-1.5 w-1.5 bg-emerald-500 rounded-full animate-ping" />
                 Active integrations
               </span>
@@ -1105,7 +1105,7 @@ export default function SettingsModule({ rolePermissions, onPermissionsChange }:
                       required
                       value={telegramToken}
                       onChange={(e) => setTelegramToken(e.target.value)}
-                      className="w-full bg-white border border-gray-200 rounded-lg px-3 py-2 text-slate-700"
+                      className="w-full bg-white border border-gray-200 rounded-lg px-3 py-2 font-mono text-slate-700"
                     />
                   </div>
                   <div className="space-y-1">
@@ -1115,7 +1115,7 @@ export default function SettingsModule({ rolePermissions, onPermissionsChange }:
                       required
                       value={telegramGroupChatId}
                       onChange={(e) => setTelegramGroupChatId(e.target.value)}
-                      className="w-full bg-white border border-gray-200 rounded-lg px-3 py-2 text-slate-700"
+                      className="w-full bg-white border border-gray-200 rounded-lg px-3 py-2 font-mono text-slate-700"
                     />
                   </div>
                   <div className="pt-2 flex justify-between items-center">
@@ -1146,7 +1146,7 @@ export default function SettingsModule({ rolePermissions, onPermissionsChange }:
                       required
                       value={kioskTerminalIp}
                       onChange={(e) => setKioskTerminalIp(e.target.value)}
-                      className="w-full bg-white border border-gray-200 rounded-lg px-3 py-2 text-center"
+                      className="w-full bg-white border border-gray-200 rounded-lg px-3 py-2 font-mono text-center"
                     />
                   </div>
                   <div className="space-y-1">
@@ -1156,7 +1156,7 @@ export default function SettingsModule({ rolePermissions, onPermissionsChange }:
                       required
                       value={kioskPort}
                       onChange={(e) => setKioskPort(e.target.value)}
-                      className="w-full bg-white border border-gray-200 rounded-lg px-3 py-2 text-center"
+                      className="w-full bg-white border border-gray-200 rounded-lg px-3 py-2 font-mono text-center"
                     />
                   </div>
                 </div>
@@ -1167,7 +1167,7 @@ export default function SettingsModule({ rolePermissions, onPermissionsChange }:
                     required
                     value={kioskSecret}
                     onChange={(e) => setKioskSecret(e.target.value)}
-                    className="w-full bg-white border border-gray-200 rounded-lg px-3 py-2"
+                    className="w-full bg-white border border-gray-200 rounded-lg px-3 py-2 font-mono"
                   />
                 </div>
               </div>
@@ -1228,7 +1228,7 @@ export default function SettingsModule({ rolePermissions, onPermissionsChange }:
                         required
                         value={s3Bucket}
                         onChange={(e) => setS3Bucket(e.target.value)}
-                        className="w-full bg-white border border-gray-200 rounded-lg px-3 py-2 text-[10px]"
+                        className="w-full bg-white border border-gray-200 rounded-lg px-3 py-2 font-sans text-[10px]"
                       />
                     </div>
                     <div className="space-y-1">
@@ -1238,7 +1238,7 @@ export default function SettingsModule({ rolePermissions, onPermissionsChange }:
                         required
                         value={s3Region}
                         onChange={(e) => setS3Region(e.target.value)}
-                        className="w-full bg-white border border-gray-200 rounded-lg px-3 py-2 text-[10px]"
+                        className="w-full bg-white border border-gray-200 rounded-lg px-3 py-2 font-sans text-[10px]"
                       />
                     </div>
                   </div>
@@ -1381,14 +1381,14 @@ export default function SettingsModule({ rolePermissions, onPermissionsChange }:
                   ) : (
                     filteredAuditLogs.map((log) => (
                       <tr key={log.id} className="hover:bg-gray-50/40 transition">
-                        <td className="p-3 text-mid-gray text-[10px] whitespace-nowrap">
+                        <td className="p-3 font-sans text-mid-gray text-[10px] whitespace-nowrap">
                           {new Date(log.timestamp).toLocaleString("vi-VN", { hour: '2-digit', minute: '2-digit', second: '2-digit', day: '2-digit', month: '2-digit' })}
                         </td>
                         <td className="p-3 font-semibold text-matte-black whitespace-nowrap">
                           {log.actor}
                         </td>
                         <td className="p-3">
-                          <span className="px-2 py-0.5 rounded-full bg-slate-100 text-slate-700 text-[9px] font-bold uppercase">
+                          <span className="px-2 py-0.5 rounded-full bg-slate-100 text-slate-700 text-[9px] font-sans font-bold uppercase">
                             {log.module}
                           </span>
                         </td>
@@ -1482,7 +1482,7 @@ export default function SettingsModule({ rolePermissions, onPermissionsChange }:
                     placeholder="Mặc định: 123456"
                     value={staffForm.pin}
                     onChange={(e) => setStaffForm({ ...staffForm, pin: e.target.value })}
-                    className="w-full bg-white border border-[#e5e5e5] rounded-xl px-3 py-2.5 text-xs font-bold tracking-widest text-center text-matte-black focus:outline-none focus:border-purple-500"
+                    className="w-full bg-white border border-[#e5e5e5] rounded-xl px-3 py-2.5 text-xs font-sans font-bold tracking-widest text-center text-matte-black focus:outline-none focus:border-purple-500"
                   />
                 </div>
               </div>
@@ -1497,7 +1497,7 @@ export default function SettingsModule({ rolePermissions, onPermissionsChange }:
                   placeholder="Ví dụ: 582910482"
                   value={staffForm.telegramChatId}
                   onChange={(e) => setStaffForm({ ...staffForm, telegramChatId: e.target.value })}
-                  className="w-full bg-white border border-[#e5e5e5] rounded-xl px-3 py-2.5 text-xs text-matte-black focus:outline-none focus:border-purple-500"
+                  className="w-full bg-white border border-[#e5e5e5] rounded-xl px-3 py-2.5 text-xs font-sans text-matte-black focus:outline-none focus:border-purple-500"
                 />
               </div>
 
@@ -1585,7 +1585,7 @@ export default function SettingsModule({ rolePermissions, onPermissionsChange }:
                     maxLength={8}
                     value={staffForm.pin}
                     onChange={(e) => setStaffForm({ ...staffForm, pin: e.target.value })}
-                    className="w-full bg-white border border-[#e5e5e5] rounded-xl px-3 py-2.5 text-xs font-bold tracking-widest text-center text-matte-black focus:outline-none focus:border-purple-500"
+                    className="w-full bg-white border border-[#e5e5e5] rounded-xl px-3 py-2.5 text-xs font-sans font-bold tracking-widest text-center text-matte-black focus:outline-none focus:border-purple-500"
                   />
                 </div>
               </div>
@@ -1600,7 +1600,7 @@ export default function SettingsModule({ rolePermissions, onPermissionsChange }:
                   placeholder="Chưa cấu hình Chat ID"
                   value={staffForm.telegramChatId}
                   onChange={(e) => setStaffForm({ ...staffForm, telegramChatId: e.target.value })}
-                  className="w-full bg-white border border-[#e5e5e5] rounded-xl px-3 py-2.5 text-xs text-matte-black focus:outline-none focus:border-purple-500"
+                  className="w-full bg-white border border-[#e5e5e5] rounded-xl px-3 py-2.5 text-xs font-sans text-matte-black focus:outline-none focus:border-purple-500"
                 />
               </div>
 

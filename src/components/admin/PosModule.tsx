@@ -1052,8 +1052,8 @@ export default function PosModule({ orders, revenueStats }: PosModuleProps) {
                                   selectedOrder?.id === o.id ? "bg-lime-50/50" : ""
                                 }`}
                               >
-                                <td className="p-4 font-bold text-slate-400">#{o.id.slice(-6).toUpperCase()}</td>
-                                <td className="p-4 font-black text-slate-900 tracking-wider">
+                                <td className="p-4 font-mono font-bold text-slate-400">#{o.id.slice(-6).toUpperCase()}</td>
+                                <td className="p-4 font-mono font-black text-slate-900 tracking-wider">
                                   <span className="px-2.5 py-1 bg-stone-100 border border-stone-200 rounded text-xs font-bold shadow-xs">
                                     {o.licensePlate}
                                   </span>
@@ -1066,7 +1066,7 @@ export default function PosModule({ orders, revenueStats }: PosModuleProps) {
                                   </p>
                                 </td>
                                 <td className="p-4">
-                                  <span className="inline-flex px-2 py-0.5 rounded bg-slate-900 text-[#A2C62C] font-black text-[10px] tracking-wide uppercase">
+                                  <span className="inline-flex px-2 py-0.5 rounded bg-slate-900 text-[#A2C62C] font-black text-[10px] tracking-wide uppercase font-mono">
                                     {o.packageCode}
                                   </span>
                                 </td>
@@ -1122,7 +1122,7 @@ export default function PosModule({ orders, revenueStats }: PosModuleProps) {
                     )}
                   </div>
                   
-                  <div className="p-3.5 bg-stone-50 border-t border-stone-150 flex items-center justify-between text-[10px] text-slate-400">
+                  <div className="p-3.5 bg-stone-50 border-t border-stone-150 flex items-center justify-between text-[10px] font-mono text-slate-400">
                     <span>* Bấm vào dòng đơn hàng để mở bảng thanh toán chi tiết từ bên phải qua</span>
                     <span>Hệ thống đối lưu dòng tiền tự động v2</span>
                   </div>
@@ -1171,12 +1171,12 @@ export default function PosModule({ orders, revenueStats }: PosModuleProps) {
                           <div className="p-4 bg-stone-50 border border-stone-200 rounded-xl flex items-center justify-between shadow-xs">
                             <div>
                               <span className="text-[9px] text-slate-400 block font-black uppercase tracking-wider">BIỂN SỐ XE</span>
-                              <span className="text-lg font-black tracking-widest text-slate-900">
+                              <span className="text-lg font-black font-mono tracking-widest text-slate-900">
                                 {selectedOrder.licensePlate}
                               </span>
                             </div>
                             <div className="text-right">
-                              <span className="inline-flex px-2.5 py-1 bg-slate-900 text-[#A2C62C] font-black text-[11px] rounded uppercase tracking-wider">
+                              <span className="inline-flex px-2.5 py-1 bg-slate-900 text-[#A2C62C] font-black text-[11px] rounded uppercase font-mono tracking-wider">
                                 {selectedOrder.packageCode}
                               </span>
                               <span className="block text-[9px] text-slate-400 font-extrabold mt-1 uppercase">
@@ -1222,7 +1222,7 @@ export default function PosModule({ orders, revenueStats }: PosModuleProps) {
                                 placeholder="Nhập mã (Ví dụ: WASSUPNEW)..."
                                 value={voucherCodeInput}
                                 onChange={(e) => setVoucherCodeInput(e.target.value)}
-                                className="flex-1 bg-white border border-stone-200 rounded-xl px-3 py-2 text-xs font-bold uppercase focus:outline-none focus:border-[#A2C62C]"
+                                className="flex-1 bg-white border border-stone-200 rounded-xl px-3 py-2 text-xs font-mono font-bold uppercase focus:outline-none focus:border-[#A2C62C]"
                               />
                               <button
                                 type="button"
@@ -1335,7 +1335,7 @@ export default function PosModule({ orders, revenueStats }: PosModuleProps) {
                               </div>
                               <p className="text-[10px] text-slate-500 leading-normal font-sans">
                                 Nội dung chuyển khoản động:<br />
-                                <span className="font-black text-slate-900 bg-stone-200 px-1.5 py-0.5 rounded text-[11px]">
+                                <span className="font-mono font-black text-slate-900 bg-stone-200 px-1.5 py-0.5 rounded text-[11px]">
                                   {`HD${selectedOrder.id.slice(-6).toUpperCase()}_${selectedOrder.licensePlate.replace(/[-.]/g, "")}`}
                                 </span><br />
                                 STK: <strong className="text-slate-800">1012999999</strong> - Vietcombank
@@ -1356,9 +1356,9 @@ export default function PosModule({ orders, revenueStats }: PosModuleProps) {
                                     placeholder="Nhập số tiền..."
                                     value={cashPaid}
                                     onChange={(e) => setCashPaid(e.target.value)}
-                                    className="w-full bg-white border border-stone-200 rounded-xl pl-3 pr-10 py-2 text-xs font-bold text-slate-900 focus:outline-none"
+                                    className="w-full bg-white border border-stone-200 rounded-xl pl-3 pr-10 py-2 text-xs font-mono font-bold text-slate-900 focus:outline-none"
                                   />
-                                  <span className="absolute right-3 top-1/2 -translate-y-1/2 text-[9px] font-bold text-slate-400">
+                                  <span className="absolute right-3 top-1/2 -translate-y-1/2 text-[9px] font-bold text-slate-400 font-mono">
                                     VND
                                   </span>
                                 </div>
@@ -1367,7 +1367,7 @@ export default function PosModule({ orders, revenueStats }: PosModuleProps) {
                               {Number(cashPaid) >= calculateTotal() && (
                                 <div className="flex justify-between border-t border-stone-200 pt-2 text-xs font-bold text-slate-900">
                                   <span className="text-slate-400 text-[9px] mt-0.5">TIỀN THỐI LẠI:</span>
-                                  <span className="text-emerald-700 font-black text-sm">
+                                  <span className="text-emerald-700 font-mono font-black text-sm">
                                     {formatVnd(Number(cashPaid) - calculateTotal())}
                                   </span>
                                 </div>
@@ -1538,7 +1538,7 @@ export default function PosModule({ orders, revenueStats }: PosModuleProps) {
                         placeholder="VND..."
                         value={newThuData.amount}
                         onChange={(e) => setNewThuData({ ...newThuData, amount: e.target.value })}
-                        className="w-full bg-white border border-stone-200 rounded-lg p-2 text-xs font-bold"
+                        className="w-full bg-white border border-stone-200 rounded-lg p-2 text-xs font-mono font-bold"
                       />
                     </div>
 
@@ -1602,8 +1602,8 @@ export default function PosModule({ orders, revenueStats }: PosModuleProps) {
                         .map((p) => (
                         <tr key={p.id} className="hover:bg-stone-50/40">
                           <td className="p-3">
-                            <span className="font-bold text-slate-950 block">{p.id}</span>
-                            <span className="text-[9px] text-slate-400 mt-0.5 block mb-1">{new Date(p.timestamp).toLocaleTimeString("vi-VN")}</span>
+                            <span className="font-mono font-bold text-slate-950 block">{p.id}</span>
+                            <span className="text-[9px] text-slate-400 font-mono mt-0.5 block mb-1">{new Date(p.timestamp).toLocaleTimeString("vi-VN")}</span>
                             {p.thuType && (
                               <span className={`inline-block px-1.5 py-0.5 rounded text-[8px] font-bold uppercase tracking-wider ${
                                 p.thuType === "service" ? "bg-blue-50 text-blue-700 border border-blue-200" :
@@ -1622,7 +1622,7 @@ export default function PosModule({ orders, revenueStats }: PosModuleProps) {
                             )}
                           </td>
                           <td className="p-3">
-                            <span className="bg-slate-100 border border-stone-200 px-1 py-0.5 rounded text-[10px] font-bold block w-fit mb-1">{p.licensePlate}</span>
+                            <span className="font-mono bg-slate-100 border border-stone-200 px-1 py-0.5 rounded text-[10px] font-bold block w-fit mb-1">{p.licensePlate}</span>
                             <span className="font-bold text-slate-700">{p.customerName}</span>
                           </td>
                           <td className="p-3">
@@ -1656,7 +1656,7 @@ export default function PosModule({ orders, revenueStats }: PosModuleProps) {
                             >
                               Sửa
                             </button>
-                            <span className="block text-[8px] text-stone-400 mt-1">🔒 LOCKED</span>
+                            <span className="block text-[8px] text-stone-400 font-mono mt-1">🔒 LOCKED</span>
                           </td>
                         </tr>
                       ))}
@@ -1736,7 +1736,7 @@ export default function PosModule({ orders, revenueStats }: PosModuleProps) {
                           placeholder="VND..."
                           value={newChiData.amount}
                           onChange={(e) => setNewChiData({ ...newChiData, amount: e.target.value })}
-                          className="w-full bg-white border border-stone-200 rounded-lg p-2 text-xs font-bold"
+                          className="w-full bg-white border border-stone-200 rounded-lg p-2 text-xs font-mono font-bold"
                         />
                       </div>
                     </div>
@@ -1805,12 +1805,12 @@ export default function PosModule({ orders, revenueStats }: PosModuleProps) {
                           return (
                             <tr key={p.id} className="hover:bg-stone-50/40">
                               <td className="p-3">
-                                <span className="font-bold text-slate-950 block">{p.id}</span>
-                                <span className="text-[9px] text-slate-400 mt-0.5 block">{new Date(p.timestamp).toLocaleTimeString("vi-VN")}</span>
+                                <span className="font-mono font-bold text-slate-950 block">{p.id}</span>
+                                <span className="text-[9px] text-slate-400 font-mono mt-0.5 block">{new Date(p.timestamp).toLocaleTimeString("vi-VN")}</span>
                               </td>
                               <td className="p-3">
                                 <span className="font-bold text-slate-800">{p.recipient}</span>
-                                <span className="text-[8px] bg-stone-100 text-stone-500 border border-stone-200 px-1 py-0.5 rounded uppercase block w-fit mt-1">
+                                <span className="text-[8px] bg-stone-100 text-stone-500 border border-stone-200 px-1 py-0.5 rounded uppercase font-mono block w-fit mt-1">
                                   {p.paymentAccount === "cash_fund" ? "Quỹ Mặt" : "Ngân hàng"}
                                 </span>
                               </td>
@@ -1902,8 +1902,8 @@ export default function PosModule({ orders, revenueStats }: PosModuleProps) {
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               <div className="bg-white border border-[#e5e5e5] p-5 rounded-2xl shadow-sm space-y-1.5">
                 <span className="text-[9px] text-slate-400 uppercase font-black tracking-wider block">KÉT TIỀN MẶT CỬA HÀNG (CASH ON HAND)</span>
-                <p className="text-xl font-black text-slate-900">{formatVnd(currentCashInDrawer)}</p>
-                <div className="flex justify-between text-[10px] text-slate-400 border-t border-stone-100 pt-1.5">
+                <p className="text-xl font-black font-mono text-slate-900">{formatVnd(currentCashInDrawer)}</p>
+                <div className="flex justify-between text-[10px] text-slate-400 border-t border-stone-100 pt-1.5 font-mono">
                   <span>Mở ca: {formatVnd(openCash)}</span>
                   <span>Thu: +{formatVnd(totalCashReceipts)} | Chi: -{formatVnd(totalCashExpenses)}</span>
                 </div>
@@ -1914,8 +1914,8 @@ export default function PosModule({ orders, revenueStats }: PosModuleProps) {
 
               <div className="bg-white border border-[#e5e5e5] p-5 rounded-2xl shadow-sm space-y-1.5">
                 <span className="text-[9px] text-slate-400 uppercase font-black tracking-wider block">TÀI KHOẢN NGÂN HÀNG VIETCOMBANK</span>
-                <p className="text-xl font-black text-slate-900">{formatVnd(currentBankBalance)}</p>
-                <div className="flex justify-between text-[10px] text-slate-400 border-t border-stone-100 pt-1.5">
+                <p className="text-xl font-black font-mono text-slate-900">{formatVnd(currentBankBalance)}</p>
+                <div className="flex justify-between text-[10px] text-slate-400 border-t border-stone-100 pt-1.5 font-mono">
                   <span>Mở ví: 45.000.000đ</span>
                   <span>Thu: +{formatVnd(totalBankReceipts)} | Chi: -{formatVnd(totalBankExpenses)}</span>
                 </div>
@@ -1927,7 +1927,7 @@ export default function PosModule({ orders, revenueStats }: PosModuleProps) {
               <div className="bg-slate-900 text-white p-5 rounded-2xl shadow-md space-y-2 flex flex-col justify-between">
                 <div>
                   <span className="text-[9px] text-stone-400 uppercase font-black tracking-wider block">TỔNG QUỸ KẾT TOÁN SỐ DƯ</span>
-                  <p className="text-2xl font-black text-[#A2C62C]">{formatVnd(currentCashInDrawer + currentBankBalance)}</p>
+                  <p className="text-2xl font-black font-mono text-[#A2C62C]">{formatVnd(currentCashInDrawer + currentBankBalance)}</p>
                 </div>
                 <button
                   onClick={() => alert("Hệ thống đã gửi dữ liệu sao kê đối lưu dòng tiền tự động khớp 100%!")}
@@ -1953,54 +1953,54 @@ export default function PosModule({ orders, revenueStats }: PosModuleProps) {
                 <div className="space-y-2.5 text-xs font-sans">
                   <div className="flex justify-between items-center p-2.5 bg-stone-50 rounded-lg">
                     <span className="font-bold text-slate-700">1. Tổng Doanh Thu Hoạt Động (Inflows):</span>
-                    <span className="font-black text-slate-900">{formatVnd(grossRevenue)}</span>
+                    <span className="font-mono font-black text-slate-900">{formatVnd(grossRevenue)}</span>
                   </div>
 
                   <div className="pl-4 space-y-2 text-slate-600 border-l-2 border-stone-100 py-1">
                     <div className="flex justify-between">
                       <span>• Baseline doanh thu tích lũy:</span>
-                      <span className="">{formatVnd(18450000)}</span>
+                      <span className="font-mono">{formatVnd(18450000)}</span>
                     </div>
                     <div className="flex justify-between">
                       <span>• Phát sinh thực tế POS:</span>
-                      <span className="">+{formatVnd(phieuThuList.reduce((sum, p) => sum + p.amount, 0))}</span>
+                      <span className="font-mono">+{formatVnd(phieuThuList.reduce((sum, p) => sum + p.amount, 0))}</span>
                     </div>
                   </div>
 
                   <div className="flex justify-between items-center p-2.5 bg-red-50 text-red-800 rounded-lg">
                     <span className="font-bold">2. Giá vốn hóa chất / Dung dịch sử dụng (COGS):</span>
-                    <span className="font-black">-{formatVnd(costOfChemicalsTotal)}</span>
+                    <span className="font-mono font-black">-{formatVnd(costOfChemicalsTotal)}</span>
                   </div>
 
                   <div className="flex justify-between items-center p-2.5 bg-red-50 text-red-800 rounded-lg">
                     <span className="font-bold">3. Trích chi hoa hồng cho thợ (Commissions):</span>
-                    <span className="font-black">-{formatVnd(technicianCommissionsTotal)}</span>
+                    <span className="font-mono font-black">-{formatVnd(technicianCommissionsTotal)}</span>
                   </div>
 
                   <div className="flex justify-between items-center p-2.5 bg-stone-50 text-slate-800 rounded-lg border-y border-stone-200">
                     <span className="font-black uppercase text-[10px]">=&gt; Lợi Nhuận Gộp (Gross Profit):</span>
-                    <span className="font-black text-forest-green text-sm">
+                    <span className="font-mono font-black text-forest-green text-sm">
                       {formatVnd(grossRevenue - costOfChemicalsTotal - technicianCommissionsTotal)}
                     </span>
                   </div>
 
                   <div className="flex justify-between items-center p-2.5 bg-red-50 text-red-800 rounded-lg">
                     <span className="font-bold">4. Chi phí gián tiếp / Vận hành (OPEX):</span>
-                    <span className="font-black">-{formatVnd(operatingCosts)}</span>
+                    <span className="font-mono font-black">-{formatVnd(operatingCosts)}</span>
                   </div>
 
                   <div className="pl-4 space-y-2 text-slate-600 border-l-2 border-stone-100 py-1">
                     <div className="flex justify-between">
                       <span>• Chi phí điện &amp; nước sản xuất:</span>
-                      <span className="">{formatVnd(phieuChiList.filter(p => p.expenseType === "utilities" && p.status === "completed").reduce((sum, p) => sum + p.amount, 0))}</span>
+                      <span className="font-mono">{formatVnd(phieuChiList.filter(p => p.expenseType === "utilities" && p.status === "completed").reduce((sum, p) => sum + p.amount, 0))}</span>
                     </div>
                     <div className="flex justify-between">
                       <span>• Chi phí mua vật tư / Mặt bằng:</span>
-                      <span className="">{formatVnd(phieuChiList.filter(p => p.expenseType === "commercial_goods" && p.status === "completed").reduce((sum, p) => sum + p.amount, 0))}</span>
+                      <span className="font-mono">{formatVnd(phieuChiList.filter(p => p.expenseType === "commercial_goods" && p.status === "completed").reduce((sum, p) => sum + p.amount, 0))}</span>
                     </div>
                     <div className="flex justify-between">
                       <span>• Đối ngoại / Tiếp khách / Khác:</span>
-                      <span className="">{formatVnd(phieuChiList.filter(p => (p.expenseType === "entertainment" || p.expenseType === "other") && p.status === "completed").reduce((sum, p) => sum + p.amount, 0))}</span>
+                      <span className="font-mono">{formatVnd(phieuChiList.filter(p => (p.expenseType === "entertainment" || p.expenseType === "other") && p.status === "completed").reduce((sum, p) => sum + p.amount, 0))}</span>
                     </div>
                   </div>
 
@@ -2009,7 +2009,7 @@ export default function PosModule({ orders, revenueStats }: PosModuleProps) {
                       <span className="font-black uppercase tracking-wider text-[10px] text-[#A2C62C]">LỢI NHUẬN RÒNG THỰC TẾ (NET PROFIT):</span>
                       <p className="text-[9px] text-stone-400">Tự động kết toán dòng tiền phát sinh theo thời gian thực.</p>
                     </div>
-                    <span className="font-black text-lg text-[#A2C62C]">
+                    <span className="font-mono font-black text-lg text-[#A2C62C]">
                       {formatVnd(netProfitVal)}
                     </span>
                   </div>
@@ -2053,7 +2053,7 @@ export default function PosModule({ orders, revenueStats }: PosModuleProps) {
                         <span className="h-3 w-3 rounded-full" style={{ backgroundColor: seg.color }}></span>
                         <span className="text-slate-600 font-bold">{seg.name}</span>
                       </div>
-                      <span className="font-black text-slate-900">{formatVnd(seg.value)}</span>
+                      <span className="font-mono font-black text-slate-900">{formatVnd(seg.value)}</span>
                     </div>
                   ))}
                 </div>
@@ -2082,18 +2082,18 @@ export default function PosModule({ orders, revenueStats }: PosModuleProps) {
             <div className="space-y-2.5">
               {auditLogs.map((log) => (
                 <div key={log.id} className="p-4 bg-stone-50 border border-stone-200/60 rounded-xl flex items-start gap-3 text-xs">
-                  <div className="p-2 bg-slate-900 text-[#A2C62C] font-black text-[9px] rounded-lg shadow-sm">
+                  <div className="p-2 bg-slate-900 text-[#A2C62C] font-black font-mono text-[9px] rounded-lg shadow-sm">
                     {log.id}
                   </div>
                   <div className="flex-1 space-y-1">
                     <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1">
                       <span className="font-black text-slate-900 uppercase tracking-wider text-[10px]">{log.action}</span>
-                      <span className="text-[10px] text-slate-400">{new Date(log.timestamp).toLocaleString("vi-VN")}</span>
+                      <span className="text-[10px] text-slate-400 font-mono">{new Date(log.timestamp).toLocaleString("vi-VN")}</span>
                     </div>
                     <p className="text-slate-600 font-medium leading-relaxed">{log.details}</p>
                     <div className="flex items-center gap-2 pt-1">
                       <span className="px-2 py-0.5 bg-stone-200 text-stone-700 font-bold rounded text-[9px]">Tác nhân: {log.actor}</span>
-                      <span className="text-[9px] text-slate-400">Đối tượng liên quan: {log.targetId}</span>
+                      <span className="text-[9px] text-slate-400 font-mono">Đối tượng liên quan: {log.targetId}</span>
                     </div>
                   </div>
                 </div>
@@ -2182,11 +2182,11 @@ export default function PosModule({ orders, revenueStats }: PosModuleProps) {
                       <tr key={log.id} className="hover:bg-stone-50/50">
                         <td className="p-3.5 font-extrabold text-slate-800">{log.shiftType}</td>
                         <td className="p-3.5 font-bold text-slate-700">{log.cashierName}</td>
-                        <td className="p-3.5 text-right text-slate-400">{formatVnd(log.openCash)}</td>
-                        <td className="p-3.5 text-right font-bold text-slate-800">{formatVnd(log.expectedCash)}</td>
-                        <td className="p-3.5 text-right font-black text-slate-900">{formatVnd(log.actualCash)}</td>
-                        <td className="p-3.5 text-right text-emerald-600 font-bold">{formatVnd(log.expectedTransfer)}</td>
-                        <td className={`p-3.5 text-right font-black ${
+                        <td className="p-3.5 text-right font-mono text-slate-400">{formatVnd(log.openCash)}</td>
+                        <td className="p-3.5 text-right font-mono font-bold text-slate-800">{formatVnd(log.expectedCash)}</td>
+                        <td className="p-3.5 text-right font-mono font-black text-slate-900">{formatVnd(log.actualCash)}</td>
+                        <td className="p-3.5 text-right font-mono text-emerald-600 font-bold">{formatVnd(log.expectedTransfer)}</td>
+                        <td className={`p-3.5 text-right font-mono font-black ${
                           log.difference < 0 ? "text-red-600" : log.difference > 0 ? "text-emerald-600" : "text-slate-900"
                         }`}>
                           {log.difference === 0 ? "—" : (log.difference > 0 ? "+" : "") + formatVnd(log.difference)}
@@ -2264,17 +2264,17 @@ export default function PosModule({ orders, revenueStats }: PosModuleProps) {
                   <p className="font-bold text-slate-400 text-[10px] uppercase tracking-wider border-b border-stone-200 pb-1.5">KẾT TOÁN LÝ THUYẾT CA TRỰC</p>
                   <div className="flex justify-between text-slate-600">
                     <span>Quỹ đầu ca (Mặt):</span>
-                    <span className="font-bold">{formatVnd(openCash)}</span>
+                    <span className="font-mono font-bold">{formatVnd(openCash)}</span>
                   </div>
                   <div className="flex justify-between text-slate-600">
                     <span>+ Doanh thu Tiền mặt thu được:</span>
-                    <span className="font-bold text-emerald-600">
+                    <span className="font-mono font-bold text-emerald-600">
                       +{formatVnd(shiftSales.filter(s => s.method === "cash").reduce((sum, s) => sum + s.total, 0))}
                     </span>
                   </div>
                   <div className="flex justify-between text-slate-800 font-bold border-t border-stone-200/80 pt-1.5">
                     <span>TỔNG TIỀN MẶT LÝ THUYẾT:</span>
-                    <span className="text-slate-950">
+                    <span className="font-mono text-slate-950">
                       {formatVnd(openCash + shiftSales.filter(s => s.method === "cash").reduce((sum, s) => sum + s.total, 0))}
                     </span>
                   </div>
@@ -2290,7 +2290,7 @@ export default function PosModule({ orders, revenueStats }: PosModuleProps) {
                     placeholder="Kiểm đếm và nhập số tiền thực có..."
                     value={actualCashInput}
                     onChange={(e) => setActualCashInput(e.target.value)}
-                    className="w-full bg-stone-50 border border-[#e5e5e5] rounded-xl px-3 py-2 text-xs font-bold text-slate-900 focus:outline-none"
+                    className="w-full bg-stone-50 border border-[#e5e5e5] rounded-xl px-3 py-2 text-xs font-mono font-bold text-slate-900 focus:outline-none"
                   />
                 </div>
 
@@ -2343,19 +2343,19 @@ export default function PosModule({ orders, revenueStats }: PosModuleProps) {
                   <p className="text-[10px] text-slate-400 font-bold uppercase tracking-wider">
                     Biên Lai Thanh Toán Kiosk POS
                   </p>
-                  <p className="text-[9px] text-slate-450">
+                  <p className="text-[9px] text-slate-450 font-mono">
                     Ngày: {new Date(printedReceipt.timestamp).toLocaleString("vi-VN")}
                   </p>
                 </div>
 
                 <div className="space-y-2.5 text-xs text-left">
-                  <div className="flex justify-between">
+                  <div className="flex justify-between font-mono">
                     <span className="text-slate-450">Mã giao dịch:</span>
                     <span className="font-bold text-slate-800">#{printedReceipt.orderId.slice(-8).toUpperCase()}</span>
                   </div>
                   <div className="flex justify-between">
                     <span className="text-slate-450">Biển số xe:</span>
-                    <span className="font-black text-slate-900 tracking-wider bg-stone-100 px-2 py-0.5 rounded">
+                    <span className="font-black text-slate-900 tracking-wider font-mono bg-stone-100 px-2 py-0.5 rounded">
                       {printedReceipt.licensePlate}
                     </span>
                   </div>
@@ -2369,12 +2369,12 @@ export default function PosModule({ orders, revenueStats }: PosModuleProps) {
                   </div>
                   
                   <div className="border-t border-dashed border-stone-200 pt-2.5 space-y-1.5">
-                    <div className="flex justify-between">
+                    <div className="flex justify-between font-mono">
                       <span className="text-slate-450">Giá trị gốc:</span>
                       <span className="text-slate-700">{formatVnd(printedReceipt.basePrice)}</span>
                     </div>
                     {printedReceipt.discount > 0 && (
-                      <div className="flex justify-between text-red-600">
+                      <div className="flex justify-between font-mono text-red-600">
                         <span>Chiết khấu (-{printedReceipt.discountPercent}%):</span>
                         <span>-{formatVnd(printedReceipt.discount)}</span>
                       </div>
@@ -2385,7 +2385,7 @@ export default function PosModule({ orders, revenueStats }: PosModuleProps) {
                     </div>
                   </div>
 
-                  <div className="border-t border-dashed border-stone-200 pt-2.5 space-y-1.5 text-[11px]">
+                  <div className="border-t border-dashed border-stone-200 pt-2.5 space-y-1.5 font-mono text-[11px]">
                     <div className="flex justify-between">
                       <span className="text-slate-450">Phương thức:</span>
                       <span className="font-bold text-slate-850 uppercase">

@@ -182,7 +182,117 @@ const getStoredState = (): SimState => {
   const data = localStorage.getItem(STORE_KEY);
   if (data) {
     try {
-       return JSON.parse(data);
+      const parsed = JSON.parse(data);
+      if (parsed && Array.isArray(parsed.staff)) {
+        // Detect duplicate IDs in staff list
+        const idMap = new Map<string, string[]>();
+        parsed.staff.forEach((s: any) => {
+          if (s && s.id) {
+            if (!idMap.has(s.id)) {
+              idMap.set(s.id, []);
+            }
+            idMap.get(s.id)!.push(s.phone || s.name);
+          }
+        });
+
+        let needsSave = false;
+        const idReplacements = new Map<string, string>(); // oldId + "_" + phone -> newId
+
+        const seenIds = new Set<string>();
+        const updatedStaff = parsed.staff.map((s: any) => {
+          if (!s || !s.id) return s;
+          
+          const isDuplicateId = idMap.get(s.id)!.length > 1;
+          const alreadySeen = seenIds.has(s.id);
+
+          if (isDuplicateId && alreadySeen) {
+            const oldId = s.id;
+            const newId = "s_" + Date.now() + "_" + Math.floor(Math.random() * 1000000) + "_" + Math.floor(Math.random() * 1000);
+            s.id = newId;
+            idReplacements.set(oldId + "_" + s.phone, newId);
+            needsSave = true;
+          }
+          seenIds.add(s.id);
+          return s;
+        });
+
+        if (needsSave) {
+          parsed.staff = updatedStaff;
+
+          idReplacements.forEach((newId, keyKey) => {
+            const [oldId, phone] = keyKey.split("_");
+            
+            // Update wassup_hr_profiles
+            try {
+              const profilesStr = localStorage.getItem("wassup_hr_profiles");
+              if (profilesStr) {
+                const profiles = JSON.parse(profilesStr);
+                let changed = false;
+                const updatedProfiles = profiles.map((p: any) => {
+                  const staffMember = parsed.staff.find((st: any) => st.phone === phone);
+                  if (p.staffId === oldId && staffMember && staffMember.id === newId) {
+                    p.staffId = newId;
+                    changed = true;
+                  }
+                  return p;
+                });
+                if (changed) {
+                  localStorage.setItem("wassup_hr_profiles", JSON.stringify(updatedProfiles));
+                }
+              }
+            } catch (e) {
+              console.error("Heal profiles error:", e);
+            }
+
+            // Update wassup_hr_certs
+            try {
+              const certsStr = localStorage.getItem("wassup_hr_certs");
+              if (certsStr) {
+                const certs = JSON.parse(certsStr);
+                let changed = false;
+                const updatedCerts = certs.map((c: any) => {
+                  const staffMember = parsed.staff.find((st: any) => st.phone === phone);
+                  if (c.staffId === oldId && staffMember && staffMember.id === newId) {
+                    c.staffId = newId;
+                    changed = true;
+                  }
+                  return c;
+                });
+                if (changed) {
+                  localStorage.setItem("wassup_hr_certs", JSON.stringify(updatedCerts));
+                }
+              }
+            } catch (e) {
+              console.error("Heal certs error:", e);
+            }
+
+            // Update wassup_hr_discipline_logs
+            try {
+              const logsStr = localStorage.getItem("wassup_hr_discipline_logs");
+              if (logsStr) {
+                const logs = JSON.parse(logsStr);
+                let changed = false;
+                const updatedLogs = logs.map((l: any) => {
+                  const staffMember = parsed.staff.find((st: any) => st.phone === phone);
+                  if (l.staffId === oldId && staffMember && staffMember.id === newId) {
+                    l.staffId = newId;
+                    changed = true;
+                  }
+                  return l;
+                });
+                if (changed) {
+                  localStorage.setItem("wassup_hr_discipline_logs", JSON.stringify(updatedLogs));
+                }
+              }
+            } catch (e) {
+              console.error("Heal logs error:", e);
+            }
+          });
+
+          localStorage.setItem(STORE_KEY, JSON.stringify(parsed));
+        }
+      }
+      return parsed;
     } catch (e) {
        return INITIAL_STATE;
     }
@@ -402,7 +512,7 @@ export const simActions = {
 
   addStaff: (data: { name: string; phone: string; role: "master_admin" | "manager" | "technician" | "accountant"; pin?: string }) => {
     const newStaff = {
-      id: "s_" + Date.now(),
+      id: "s_" + Date.now() + "_" + Math.floor(Math.random() * 1000000) + "_" + Math.floor(Math.random() * 1000),
       name: data.name,
       phone: data.phone,
       role: data.role,

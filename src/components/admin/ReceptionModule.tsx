@@ -28,6 +28,7 @@ import {
 } from "lucide-react";
 import { OrderStatusView, WoStatus } from "../../types/workOrder.types";
 import { Booth, Service } from "../../types/order.types";
+import { MarkdownTextarea, MarkdownRenderer } from "./shared/Markdown";
 import { simActions } from "../../lib/supabase/client";
 import { SERVICES_CATALOG, ADDONS_CATALOG } from "../../lib/services";
 
@@ -606,7 +607,7 @@ export default function ReceptionModule({ orders, booths, staff }: ReceptionModu
               <div key={wo.id} className="bg-white border border-red-200 p-4 rounded-xl flex items-center justify-between gap-4 shadow-sm">
                 <div className="space-y-1">
                   <div className="flex items-center gap-2">
-                    <span className="font-black text-xs text-red-600 tracking-wider bg-red-100 px-2 py-0.5 rounded">
+                    <span className="font-mono font-black text-xs text-red-600 tracking-wider bg-red-100 px-2 py-0.5 rounded">
                       {wo.licensePlate}
                     </span>
                     <span className="text-[10px] text-gray-500 uppercase font-sans font-bold">
@@ -668,7 +669,7 @@ export default function ReceptionModule({ orders, booths, staff }: ReceptionModu
                 <Clock className="h-4 w-4 text-brand-green" />
                 <span className="text-xs font-extrabold uppercase text-brand-green font-display">Hàng Chờ Xe</span>
               </div>
-              <span className="bg-brand-green/20 text-brand-green font-black text-[10px] px-2 py-0.5 rounded-full">
+              <span className="bg-brand-green/20 text-brand-green font-mono font-black text-[10px] px-2 py-0.5 rounded-full">
                 {orders.filter(o => o.status === 'queued').length}
               </span>
             </div>
@@ -695,7 +696,7 @@ export default function ReceptionModule({ orders, booths, staff }: ReceptionModu
                     className="p-3 bg-slate-900 border border-slate-850 rounded-lg hover:border-brand-green/40 transition cursor-pointer hover:bg-slate-850 space-y-2 select-none"
                   >
                     <div className="flex justify-between items-start">
-                      <span className="text-[10px] text-brand-green bg-brand-green/10 px-1.5 py-0.5 rounded font-extrabold">
+                      <span className="text-[10px] font-mono text-brand-green bg-brand-green/10 px-1.5 py-0.5 rounded font-extrabold">
                         {wo.packageCode}
                       </span>
                       <span className="text-[9px] text-slate-500 uppercase font-sans font-bold">
@@ -703,7 +704,7 @@ export default function ReceptionModule({ orders, booths, staff }: ReceptionModu
                       </span>
                     </div>
                     <div>
-                      <div className="text-sm font-black tracking-wider text-white">{wo.licensePlate}</div>
+                      <div className="text-sm font-black font-mono tracking-wider text-white">{wo.licensePlate}</div>
                       <div className="text-[10px] text-slate-400 font-sans mt-0.5 truncate">
                         {wo.customerName || "Khách vãng lai"}
                       </div>
@@ -793,10 +794,10 @@ export default function ReceptionModule({ orders, booths, staff }: ReceptionModu
                         >
                           {/* Card Header: Package & License Plate */}
                           <div className="flex items-center justify-between">
-                            <span className="text-xs font-black text-slate-950 tracking-wider">
+                            <span className="font-mono text-xs font-black text-slate-950 tracking-wider">
                               {wo.licensePlate}
                             </span>
-                            <span className="text-[9px] font-extrabold text-forest-green bg-brand-green-light px-1.5 py-0.5 rounded">
+                            <span className="text-[9px] font-extrabold font-mono text-forest-green bg-brand-green-light px-1.5 py-0.5 rounded">
                               {wo.packageCode}
                             </span>
                           </div>
@@ -1107,7 +1108,7 @@ export default function ReceptionModule({ orders, booths, staff }: ReceptionModu
                                 selectedOrder?.id === wo.id ? "bg-brand-green-light" : ""
                               }`}
                             >
-                              <td className="p-4 font-extrabold text-matte-black tracking-wider text-sm">{wo.licensePlate}</td>
+                              <td className="p-4 font-extrabold text-matte-black tracking-wider text-sm font-mono">{wo.licensePlate}</td>
                               <td className="p-4 font-bold text-matte-black">
                                 <div>{wo.customerName}</div>
                                 <div className="text-[10px] text-mid-gray font-normal">{wo.customerPhone || "Khách vãng lai"}</div>
@@ -1175,7 +1176,7 @@ export default function ReceptionModule({ orders, booths, staff }: ReceptionModu
                   <div className="flex justify-between items-start border-b border-stone-100 pb-3">
                     <div>
                       <span className="text-[10px] font-sans font-extrabold text-mid-gray block uppercase tracking-wider">Chi Tiết Lệnh Xe</span>
-                      <span className="text-xl font-black text-matte-black tracking-widest">{selectedOrder.licensePlate}</span>
+                      <span className="text-xl font-black font-mono text-matte-black tracking-widest">{selectedOrder.licensePlate}</span>
                     </div>
                     <span className={`text-[10px] font-black uppercase px-2.5 py-1 rounded-full border ${
                       selectedOrder.status === 'done' ? "bg-brand-green text-matte-black border-brand-green" :
@@ -1200,7 +1201,7 @@ export default function ReceptionModule({ orders, booths, staff }: ReceptionModu
                     </div>
                     <div className="space-y-0.5">
                       <span className="text-[9px] text-stone-400 font-extrabold uppercase block">Số điện thoại:</span>
-                      <span className="text-matte-black block font-semibold">{selectedOrder.customerPhone || "Khách vãng lai"}</span>
+                      <span className="text-matte-black font-mono block font-semibold">{selectedOrder.customerPhone || "Khách vãng lai"}</span>
                     </div>
                     <div className="space-y-0.5">
                       <span className="text-[9px] text-stone-400 font-extrabold uppercase block">Dịch vụ chính:</span>
@@ -1308,12 +1309,12 @@ export default function ReceptionModule({ orders, booths, staff }: ReceptionModu
                     </div>
 
                     <div className="space-y-1.5">
-                      <textarea
-                        required
+                      <MarkdownTextarea
+                        id="reception-note-text"
                         placeholder="Nhập nội dung nhật ký ghi nhận xe..."
                         value={noteText}
-                        onChange={(e) => setNoteText(e.target.value)}
-                        className="w-full h-14 bg-white border border-[#e5e5e5] rounded-xl p-2.5 text-xs font-sans text-matte-black focus:outline-none focus:border-brand-green resize-none"
+                        onChange={(val) => setNoteText(val)}
+                        rows={2}
                       />
                     </div>
 
@@ -1404,11 +1405,12 @@ export default function ReceptionModule({ orders, booths, staff }: ReceptionModu
                                     ))}
                                   </div>
                                 </div>
-                                <textarea
+                                <MarkdownTextarea
+                                  id="rating-vehicle-comment"
                                   placeholder="Nhập nhận xét về chất lượng rửa, dọn sạch, độ bóng xe..."
                                   value={ratingVehicleComment}
-                                  onChange={(e) => setRatingVehicleComment(e.target.value)}
-                                  className="w-full h-12 bg-white border border-[#e5e5e5] rounded-lg p-2 text-xs font-sans text-matte-black focus:outline-none focus:border-brand-green resize-none"
+                                  onChange={(val) => setRatingVehicleComment(val)}
+                                  rows={2}
                                 />
                               </div>
 
@@ -1431,11 +1433,12 @@ export default function ReceptionModule({ orders, booths, staff }: ReceptionModu
                                     ))}
                                   </div>
                                 </div>
-                                <textarea
+                                <MarkdownTextarea
+                                  id="rating-ktv-comment"
                                   placeholder="Nhập nhận xét về thái độ phục vụ, tốc độ thi công của KTV..."
                                   value={ratingKtvComment}
-                                  onChange={(e) => setRatingKtvComment(e.target.value)}
-                                  className="w-full h-12 bg-white border border-[#e5e5e5] rounded-lg p-2 text-xs font-sans text-matte-black focus:outline-none focus:border-brand-green resize-none"
+                                  onChange={(val) => setRatingKtvComment(val)}
+                                  rows={2}
                                 />
                               </div>
 
@@ -1643,10 +1646,10 @@ export default function ReceptionModule({ orders, booths, staff }: ReceptionModu
                         <tr key={tech.id} className="hover:bg-stone-50/50 transition">
                           <td className="p-4">
                             <span className="font-extrabold text-matte-black text-sm block">{tech.name}</span>
-                            <span className="text-[9px] text-mid-gray uppercase font-semibold">Mã: {tech.id} | Chức vụ: Kỹ thuật viên</span>
+                            <span className="text-[9px] text-mid-gray uppercase font-mono font-semibold">Mã: {tech.id} | Chức vụ: Kỹ thuật viên</span>
                           </td>
                           <td className="p-4 text-center font-bold text-matte-black text-sm">{completed}</td>
-                          <td className="p-4 text-center text-mid-gray font-bold">{duration} phút</td>
+                          <td className="p-4 text-center font-mono text-mid-gray font-bold">{duration} phút</td>
                           <td className="p-4 text-center">
                             <span className={`px-2 py-0.5 rounded font-bold ${extensions > 3 ? "bg-amber-100 text-amber-800" : "bg-stone-100 text-stone-700"}`}>
                               {extensions} lần
@@ -1791,7 +1794,7 @@ export default function ReceptionModule({ orders, booths, staff }: ReceptionModu
                     if (plate.trim().length >= 3) setShowPlateSuggestions(true);
                   }}
                   onBlur={() => setTimeout(() => setShowPlateSuggestions(false), 200)}
-                  className="w-full bg-emerald-50/10 border-2 border-forest-green focus:border-forest-green rounded-2xl px-4 py-4 text-center font-black text-xl tracking-widest text-matte-black focus:outline-none shadow-inner placeholder-mid-gray/45 uppercase"
+                  className="w-full bg-emerald-50/10 border-2 border-forest-green focus:border-forest-green rounded-2xl px-4 py-4 text-center font-black text-xl font-mono tracking-widest text-matte-black focus:outline-none shadow-inner placeholder-mid-gray/45 uppercase"
                 />
                 
                 {/* Auto suggest dropdown from CRM */}
@@ -1807,7 +1810,7 @@ export default function ReceptionModule({ orders, booths, staff }: ReceptionModu
                         <div className="flex items-center gap-2">
                           <Car className="h-4 w-4 text-forest-green" />
                           <div>
-                            <span className="font-extrabold text-xs text-matte-black tracking-wider block">{sugg.plate}</span>
+                            <span className="font-mono font-extrabold text-xs text-matte-black tracking-wider block">{sugg.plate}</span>
                             <span className="text-[10px] text-mid-gray block font-sans font-medium">{sugg.customerName} - {sugg.phone}</span>
                           </div>
                         </div>
@@ -1829,7 +1832,7 @@ export default function ReceptionModule({ orders, booths, staff }: ReceptionModu
                         orders.filter(o => o.licensePlate.toUpperCase().includes(plate.toUpperCase())).length
                       })
                     </span>
-                    <span className="text-[9px] text-mid-gray font-bold">{plate.toUpperCase()}</span>
+                    <span className="text-[9px] text-mid-gray font-mono font-bold">{plate.toUpperCase()}</span>
                   </div>
 
                   {(() => {
@@ -1862,7 +1865,7 @@ export default function ReceptionModule({ orders, booths, staff }: ReceptionModu
                                 {h.notes && <p className="text-mid-gray italic mt-1 leading-relaxed text-[9px]">Ghi chú: "{h.notes}"</p>}
                               </div>
                               <div className="text-right flex flex-col items-end gap-1">
-                                <span className="font-bold text-matte-black">{formatVnd(h.total)}</span>
+                                <span className="font-bold text-matte-black font-mono">{formatVnd(h.total)}</span>
                                 <span className={`px-1.5 py-0.5 rounded text-[8px] font-black uppercase ${
                                   h.status === 'done' ? "bg-emerald-100 text-emerald-800" : "bg-blue-50 text-blue-850"
                                 }`}>
@@ -1971,13 +1974,13 @@ export default function ReceptionModule({ orders, booths, staff }: ReceptionModu
                       }`}
                     >
                       <div className="flex items-center justify-between w-full">
-                        <span className="font-extrabold text-[10px] tracking-wider uppercase text-xs">{pkg.code}</span>
+                        <span className="font-extrabold text-[10px] tracking-wider uppercase font-mono text-xs">{pkg.code}</span>
                         {pkg.duration && (
                           <span className="text-[9px] font-sans text-gray-400 font-semibold">{pkg.duration} phút</span>
                         )}
                       </div>
                       <h4 className="font-display font-bold text-[11px] text-matte-black uppercase tracking-tight leading-tight mt-1 line-clamp-2">{pkg.name}</h4>
-                      <span className="text-[10px] text-forest-green font-extrabold block mt-1">{formatVnd(pkg.price)}</span>
+                      <span className="font-mono text-[10px] text-forest-green font-extrabold block mt-1">{formatVnd(pkg.price)}</span>
                     </button>
                   ))}
                 </div>
@@ -2041,7 +2044,7 @@ export default function ReceptionModule({ orders, booths, staff }: ReceptionModu
                           >
                             <div className="space-y-0.5">
                               <div className="flex items-center gap-1.5">
-                                <span className="text-[9px] font-extrabold bg-stone-100 px-1 rounded text-stone-600">
+                                <span className="font-mono text-[9px] font-extrabold bg-stone-100 px-1 rounded text-stone-600">
                                   {addon.code}
                                 </span>
                                 <span className="font-display font-extrabold text-[11px] text-matte-black">
@@ -2053,7 +2056,7 @@ export default function ReceptionModule({ orders, booths, staff }: ReceptionModu
                               )}
                             </div>
                             <div className="flex items-center gap-2">
-                              <span className="text-xs font-black text-forest-green">{formatVnd(addon.price)}</span>
+                              <span className="font-mono text-xs font-black text-forest-green">{formatVnd(addon.price)}</span>
                               <input
                                 type="checkbox"
                                 checked={!!isChecked}
@@ -2080,7 +2083,7 @@ export default function ReceptionModule({ orders, booths, staff }: ReceptionModu
                         key={addon.id}
                         className="inline-flex items-center gap-1 bg-brand-green-light border border-brand-green/30 px-2 py-1 rounded-lg text-[10px] font-sans font-semibold text-matte-black transition"
                       >
-                        <span className="font-bold opacity-75">[{addon.code}]</span>
+                        <span className="font-mono font-bold opacity-75">[{addon.code}]</span>
                         <span>{addon.name}</span>
                         <span className="text-forest-green font-extrabold">({formatVnd(addon.price)})</span>
                         <button
@@ -2110,7 +2113,7 @@ export default function ReceptionModule({ orders, booths, staff }: ReceptionModu
                   </div>
                 </div>
                 <div className="text-right">
-                  <span className="text-lg font-black text-sky-700">
+                  <span className="font-mono text-lg font-black text-sky-700">
                     {(selectedPkg.duration || 30) + selectedAddons.reduce((sum, a) => sum + (a.duration || 0), 0)}
                   </span>
                   <span className="text-xs font-bold text-sky-700 ml-1">phút</span>
@@ -2122,12 +2125,12 @@ export default function ReceptionModule({ orders, booths, staff }: ReceptionModu
                 <label className="text-xs font-sans text-mid-gray uppercase font-extrabold block">
                   Ghi chú nhận xe (Mô tả tình trạng, yêu cầu đặc biệt)
                 </label>
-                <textarea
-                  rows={2}
+                <MarkdownTextarea
+                  id="reception-check-in-note"
                   placeholder="Nhập ghi chú quan trọng từ khách hàng hoặc tình trạng cần lưu ý..."
                   value={checkInNote}
-                  onChange={(e) => setCheckInNote(e.target.value)}
-                  className="w-full bg-white border border-[#e5e5e5] rounded-xl px-3 py-2.5 text-xs font-sans text-matte-black focus:outline-none focus:border-brand-green resize-none"
+                  onChange={(val) => setCheckInNote(val)}
+                  rows={2}
                 />
               </div>
 
@@ -2177,8 +2180,8 @@ export default function ReceptionModule({ orders, booths, staff }: ReceptionModu
               <div className="bg-stone-50 p-4 rounded-xl border border-stone-200">
                 <div className="flex justify-between items-start">
                   <div>
-                    <span className="text-[10px] font-black text-forest-green bg-brand-green-light px-2 py-0.5 rounded uppercase">{dispatchingWo.packageCode}</span>
-                    <h4 className="text-lg font-black text-matte-black mt-1">{dispatchingWo.licensePlate}</h4>
+                    <span className="text-[10px] font-mono font-black text-forest-green bg-brand-green-light px-2 py-0.5 rounded uppercase">{dispatchingWo.packageCode}</span>
+                    <h4 className="font-mono text-lg font-black text-matte-black mt-1">{dispatchingWo.licensePlate}</h4>
                   </div>
                   <div className="text-right">
                     <span className="text-[10px] text-mid-gray font-bold uppercase">{dispatchingWo.vehicleSegment}</span>
@@ -2313,7 +2316,7 @@ export default function ReceptionModule({ orders, booths, staff }: ReceptionModu
               <div className="bg-slate-950 p-2.5 rounded border border-slate-800 space-y-1">
                 <div className="flex justify-between text-[11px] font-sans">
                   <span className="text-gray-500">Biển số:</span>
-                  <strong className="text-white tracking-wider">{telegramNotification.plate}</strong>
+                  <strong className="font-mono text-white tracking-wider">{telegramNotification.plate}</strong>
                 </div>
                 <div className="flex justify-between text-[11px] font-sans">
                   <span className="text-gray-500">Vị trí:</span>

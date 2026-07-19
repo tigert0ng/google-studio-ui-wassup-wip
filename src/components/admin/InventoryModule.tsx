@@ -26,6 +26,7 @@ import {
   ShoppingBag,
   Briefcase
 } from "lucide-react";
+import { MarkdownTextarea, MarkdownRenderer } from "./shared/Markdown";
 
 import StockCounting from "./inventory/StockCounting";
 import InventoryReports from "./inventory/InventoryReports";
@@ -694,7 +695,7 @@ export default function InventoryModule() {
         <div className="bg-white border border-[#e5e5e5] p-5 rounded-2xl shadow-sm flex items-center justify-between">
           <div className="space-y-1">
             <span className="text-[10px] text-mid-gray uppercase font-extrabold tracking-wider font-sans">TỔNG TRỊ GIÁ TÀI SẢN KHO</span>
-            <span className="text-xl font-black text-matte-black block">{formatVnd(grandTotalAssetValue)}</span>
+            <span className="text-xl font-black text-matte-black block font-sans">{formatVnd(grandTotalAssetValue)}</span>
             <span className="text-[9px] text-forest-green font-sans block">Gồm cả khấu hao Công cụ dụng cụ</span>
           </div>
           <div className="h-10 w-10 rounded-xl bg-emerald-50 text-forest-green flex items-center justify-center border border-emerald-100 shrink-0">
@@ -706,7 +707,7 @@ export default function InventoryModule() {
         <div className="bg-white border border-[#e5e5e5] p-5 rounded-2xl shadow-sm flex items-center justify-between">
           <div className="space-y-1">
             <span className="text-[10px] text-mid-gray uppercase font-extrabold tracking-wider font-sans">VẬT TƯ CẦN NHẬP GẤP</span>
-            <span className="text-xl font-black block text-matte-black">
+            <span className="text-xl font-black block text-matte-black font-sans">
               {lowStockItems.length} <span className="text-xs font-sans text-mid-gray">mặt hàng</span>
             </span>
             <span className={`text-[9px] font-sans font-semibold block ${lowStockItems.length > 0 ? "text-red-500 animate-pulse" : "text-mid-gray"}`}>
@@ -724,7 +725,7 @@ export default function InventoryModule() {
         <div className="bg-white border border-[#e5e5e5] p-5 rounded-2xl shadow-sm flex items-center justify-between">
           <div className="space-y-1">
             <span className="text-[10px] text-mid-gray uppercase font-extrabold tracking-wider font-sans">ƯỚC KHẤU HAO THÁNG</span>
-            <span className="text-xl font-black text-matte-black block">-{formatVnd(totalMonthlyDepreciation)}</span>
+            <span className="text-xl font-black text-matte-black block font-sans">-{formatVnd(totalMonthlyDepreciation)}</span>
             <span className="text-[9px] text-purple-600 font-sans block">Trích thẳng hàng tháng (Straight Line)</span>
           </div>
           <div className="h-10 w-10 rounded-xl bg-purple-50 text-purple-600 flex items-center justify-center border border-purple-100 shrink-0">
@@ -736,7 +737,7 @@ export default function InventoryModule() {
         <div className="bg-white border border-[#e5e5e5] p-5 rounded-2xl shadow-sm flex items-center justify-between">
           <div className="space-y-1">
             <span className="text-[10px] text-mid-gray uppercase font-extrabold tracking-wider font-sans">TẦN SUẤT BIẾN ĐỘNG KHO</span>
-            <span className="text-xl font-black block text-matte-black">
+            <span className="text-xl font-black block text-matte-black font-sans">
               {ledger.length} <span className="text-xs font-sans text-mid-gray">lần giao dịch</span>
             </span>
             <span className="text-[9px] text-blue-600 font-sans block">Ghi nhận vào sổ thẻ kho thực tế</span>
@@ -871,7 +872,7 @@ export default function InventoryModule() {
                           <td className="p-4">
                             <div className="space-y-0.5">
                               <span className="font-extrabold text-sm text-matte-black block leading-snug">{item.name}</span>
-                              <span className="text-[9px] text-[#a5a5a5] tracking-wider block uppercase">
+                              <span className="text-[9px] text-[#a5a5a5] font-sans tracking-wider block uppercase">
                                 ID: {item.id} {item.purchaseDate ? `· Nhập ngày ${new Date(item.purchaseDate).toLocaleDateString("vi-VN")}` : ""}
                               </span>
                             </div>
@@ -902,10 +903,10 @@ export default function InventoryModule() {
                               </span>
                             </div>
                           </td>
-                          <td className="p-4 text-right font-bold text-matte-black">
+                          <td className="p-4 text-right font-sans font-bold text-matte-black">
                             {formatVnd(item.pricePerUnit)}
                           </td>
-                          <td className="p-4 text-right text-sm text-matte-black font-extrabold">
+                          <td className="p-4 text-right font-sans text-sm text-matte-black font-extrabold">
                             <div className="space-y-0.5">
                               <span className={item.category === "tool" ? "text-purple-700" : "text-forest-green"}>
                                 {formatVnd(bookValue)}
@@ -1025,7 +1026,7 @@ export default function InventoryModule() {
                   ) : (
                     filteredLedger.map(row => (
                       <tr key={row.id} className="hover:bg-warm-white/30 transition text-[11px]">
-                        <td className="p-3.5 text-[#a5a5a5]">
+                        <td className="p-3.5 text-[#a5a5a5] font-sans">
                           {new Date(row.date).toLocaleString("vi-VN", {
                             day: "2-digit",
                             month: "2-digit",
@@ -1051,12 +1052,12 @@ export default function InventoryModule() {
                           {row.quantityChanged > 0 ? `+${row.quantityChanged}` :
                            row.quantityChanged < 0 ? row.quantityChanged : "0 (Val)"}
                         </td>
-                        <td className="p-3.5 text-center font-black text-matte-black">
+                        <td className="p-3.5 text-center font-black text-matte-black font-sans">
                           {row.balanceAfter}
                         </td>
                         <td className="p-3.5 font-semibold text-matte-black">{row.actor}</td>
                         <td className="p-3.5 text-right text-mid-gray max-w-[200px] truncate" title={row.reason}>
-                          {row.reason}
+                          <MarkdownRenderer text={row.reason} />
                         </td>
                       </tr>
                     ))
@@ -1194,13 +1195,12 @@ export default function InventoryModule() {
 
                     <div className="space-y-1.5">
                       <label className="text-[9px] font-extrabold uppercase text-mid-gray">Lý do điều chuyển chi tiết</label>
-                      <textarea
-                        rows={2}
-                        required
+                      <MarkdownTextarea
+                        id="inventory-movement-reason"
                         placeholder="Ghi rõ số hóa đơn nhập hoặc tên kỹ thuật nhận bọt tuyết..."
                         value={movementReason}
-                        onChange={(e) => setMovementReason(e.target.value)}
-                        className="w-full bg-white border border-[#e5e5e5] rounded-xl px-3.5 py-2.5 text-xs text-matte-black focus:outline-none resize-none"
+                        onChange={(val) => setMovementReason(val)}
+                        rows={2}
                       />
                     </div>
 
@@ -1232,7 +1232,7 @@ export default function InventoryModule() {
                   <div className="bg-purple-50 border border-purple-100 p-4 rounded-xl text-center space-y-3.5 shadow-xs">
                     <div className="space-y-1">
                       <span className="text-[9px] text-[#a5a5a5] font-extrabold uppercase tracking-widest block font-sans">Giá trị tài sản ước tính hao mòn kỳ này</span>
-                      <strong className="text-xl font-black text-purple-700 block">
+                      <strong className="text-xl font-sans font-black text-purple-700 block">
                         -{formatVnd(totalMonthlyDepreciation)}
                       </strong>
                     </div>
@@ -1380,11 +1380,11 @@ export default function InventoryModule() {
                       <span className="text-[8px] text-forest-green font-black block uppercase tracking-wider">Hạch toán hao phí tự động</span>
                       <div className="flex justify-between items-center text-xs">
                         <span className="text-mid-gray font-medium">Hóa chất bọt bọt bạt lý thuyết:</span>
-                        <strong className="text-matte-black">{calculatedConsumption.toFixed(1)} Lít</strong>
+                        <strong className="text-matte-black font-sans">{calculatedConsumption.toFixed(1)} Lít</strong>
                       </div>
                       <div className="flex justify-between items-center text-xs">
                         <span className="text-mid-gray font-medium">Đổi can tương đương trừ kho:</span>
-                        <strong className="text-red-600">-{Math.floor(calculatedConsumption / 20) || 1} Can (20L)</strong>
+                        <strong className="text-red-600 font-sans">-{Math.floor(calculatedConsumption / 20) || 1} Can (20L)</strong>
                       </div>
                       <p className="text-[9px] text-[#a5a5a5] leading-normal pt-1 border-t border-emerald-100/50">
                         * Thẻ kho bọt tuyết WASSUP SOAP (can 20L) đã được cập nhật lùi tồn kho tương đương trên bảng hệ thống.
@@ -1557,7 +1557,7 @@ export default function InventoryModule() {
                           placeholder="Ví dụ: 125000"
                           value={itemPrice}
                           onChange={(e) => setItemPrice(e.target.value)}
-                          className="w-full bg-white border border-[#e5e5e5] rounded-xl pl-3.5 pr-12 py-3 text-xs text-matte-black focus:outline-none focus:border-forest-green transition-colors font-bold"
+                          className="w-full bg-white border border-[#e5e5e5] rounded-xl pl-3.5 pr-12 py-3 text-xs text-matte-black focus:outline-none focus:border-forest-green transition-colors font-sans font-bold"
                         />
                         <span className="absolute right-4 top-1/2 -translate-y-1/2 text-mid-gray font-bold text-[10px] uppercase">
                           VND
@@ -1577,7 +1577,7 @@ export default function InventoryModule() {
                         placeholder="Ví dụ: 10"
                         value={itemQuantity}
                         onChange={(e) => setItemQuantity(e.target.value)}
-                        className="w-full bg-white border border-[#e5e5e5] rounded-xl px-3.5 py-3 text-xs text-matte-black focus:outline-none focus:border-forest-green transition-colors font-bold"
+                        className="w-full bg-white border border-[#e5e5e5] rounded-xl px-3.5 py-3 text-xs text-matte-black focus:outline-none focus:border-forest-green transition-colors font-sans font-bold"
                       />
                     </div>
 
@@ -1592,7 +1592,7 @@ export default function InventoryModule() {
                         placeholder="Mặc định cảnh báo khi dưới: 5"
                         value={itemThreshold}
                         onChange={(e) => setItemThreshold(e.target.value)}
-                        className="w-full bg-white border border-[#e5e5e5] rounded-xl px-3.5 py-3 text-xs text-matte-black focus:outline-none focus:border-forest-green transition-colors"
+                        className="w-full bg-white border border-[#e5e5e5] rounded-xl px-3.5 py-3 text-xs text-matte-black focus:outline-none focus:border-forest-green transition-colors font-sans"
                       />
                     </div>
 
@@ -1619,7 +1619,7 @@ export default function InventoryModule() {
                               min="1"
                               value={usefulLifeMonths}
                               onChange={(e) => setUsefulLifeMonths(e.target.value)}
-                              className="w-full bg-white border border-[#e5e5e5] rounded-xl px-3 py-2 text-xs text-matte-black focus:outline-none focus:border-purple-500"
+                              className="w-full bg-white border border-[#e5e5e5] rounded-xl px-3 py-2 text-xs text-matte-black focus:outline-none focus:border-purple-500 font-sans"
                             />
                           </div>
 
@@ -1650,13 +1650,13 @@ export default function InventoryModule() {
                         <span className="text-xs font-sans text-slate-500 font-medium">
                           {itemQuantity ? `${itemQuantity} ${itemUnit || "đơn vị"}` : "0 đơn vị"} × {itemPrice ? formatVnd(Number(itemPrice)) : "0đ"}
                         </span>
-                        <span className="text-lg font-black text-slate-900 tracking-tight">
+                        <span className="text-lg font-black text-slate-900 font-sans tracking-tight">
                           {formatVnd((Number(itemPrice) || 0) * (Number(itemQuantity) || 0))}
                         </span>
                       </div>
                       <div className="pt-2 border-t border-stone-200 flex items-center justify-between text-slate-800 text-xs font-black uppercase tracking-wide">
                         <span>TỔNG TIỀN THANH TOÁN GỐC:</span>
-                        <span className="text-xl font-extrabold text-forest-green">
+                        <span className="text-xl font-extrabold text-forest-green font-sans">
                           {formatVnd((Number(itemPrice) || 0) * (Number(itemQuantity) || 0))}
                         </span>
                       </div>

@@ -229,7 +229,7 @@ export default function NotificationManager() {
                 <h4 className="font-display font-black text-xs uppercase tracking-wider text-matte-black">
                   {toast.title}
                 </h4>
-                <span className="text-[9px] font-bold text-mid-gray shrink-0">
+                <span className="text-[9px] font-mono font-bold text-mid-gray shrink-0">
                   {toast.timestamp}
                 </span>
               </div>

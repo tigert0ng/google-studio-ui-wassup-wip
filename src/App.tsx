@@ -70,25 +70,27 @@ import StaffModule from "./components/admin/StaffModule";
 import SettingsModule from "./components/admin/SettingsModule";
 import NotificationManager from "./components/admin/shared/NotificationManager";
 import LoginModule from "./components/admin/LoginModule";
+import HrModule from "./components/admin/HrModule";
 
 const DEFAULT_ROLE_PERMISSIONS: Record<string, string[]> = {
-  master_admin: ["dashboard", "reception", "ktv", "pos", "finance", "crm", "services", "inventory", "monitor", "staff", "settings"],
-  manager: ["dashboard", "reception", "ktv", "crm", "services", "inventory", "monitor"],
+  master_admin: ["dashboard", "reception", "ktv", "pos", "finance", "crm", "services", "inventory", "monitor", "staff", "settings", "hr"],
+  manager: ["dashboard", "reception", "ktv", "crm", "services", "inventory", "monitor", "hr"],
   technician: ["ktv", "monitor"],
   accountant: ["dashboard", "pos", "finance", "crm", "services", "inventory"]
 };
 
-// Unified dynamic 9-module navigation list according to PRD v2.3
+// Unified dynamic 10-module navigation list according to PRD v2.3 & Module 8
 const ADMIN_MODULES = [
   { id: "dashboard", label: "M1: Dashboard & Live Ops", icon: TrendingUp, category: "QUẢN TRỊ VẬN HÀNH" },
   { id: "reception", label: "M2: Tiếp nhận & Điều phối", icon: Laptop, category: "QUẢN TRỊ VẬN HÀNH" },
-  { id: "ktv", label: "M3: Kỹ Thuật Viên Mobile", icon: Wrench, category: "QUẢN TRỊ VẬN HÀNH" },
-  { id: "pos", label: "M4: POS Thu ngân & Ca kíp", icon: CreditCard, category: "QUẢN TRỊ VẬN HÀNH" },
+  { id: "ktv", label: "MX: Kỹ Thuật Viên Mobile", icon: Wrench, category: "QUẢN TRỊ VẬN HÀNH" },
+  { id: "pos", label: "M3: POS Thu ngân & Ca kíp", icon: CreditCard, category: "QUẢN TRỊ VẬN HÀNH" },
   { id: "finance", label: "M4.5: Sổ cái Tài chính", icon: DollarSign, category: "QUẢN TRỊ VẬN HÀNH" },
-  { id: "crm", label: "M8: Khách Hàng & CRM", icon: Tag, category: "QUẢN TRỊ VẬN HÀNH" },
+  { id: "crm", label: "M4: Khách Hàng & CRM", icon: Tag, category: "QUẢN TRỊ VẬN HÀNH" },
   { id: "services", label: "M5: Gói dịch vụ & Định mức (BOM)", icon: Layers, category: "DỮ LIỆU & DANH MỤC" },
   { id: "inventory", label: "M6: Kho vật tư & Hao phí", icon: Boxes, category: "DỮ LIỆU & DANH MỤC" },
-  { id: "system", label: "M7: Hệ thống & Cài đặt", icon: Settings, category: "HỆ THỐNG TRẠM" }
+  { id: "hr", label: "M8: Carer Performance", icon: Users, category: "HỆ THỐNG TRẠM" },
+  { id: "system", label: "M0: Hệ thống & Cài đặt", icon: Settings, category: "HỆ THỐNG TRẠM" }
 ];
 
 export default function App() {
@@ -374,7 +376,7 @@ function AppContent() {
 
               {/* Simulation bottom utility inside drawer */}
               <div className="p-5 border-t border-[#262626] space-y-2.5 bg-[#0f0f0f]/30">
-                <span className="text-[9px] text-gray-500 font-extrabold block uppercase tracking-wider">SIMULATION UTILITIES</span>
+                <span className="text-[9px] text-gray-500 font-extrabold block uppercase tracking-wider font-sans">SIMULATION UTILITIES</span>
                 <button
                   onClick={() => {
                     if (window.confirm("Khôi phục toàn bộ database về hạt giống dữ liệu gốc ban đầu?")) {
@@ -519,7 +521,7 @@ function AppContent() {
                               : "text-gray-400 hover:bg-gray-900 hover:text-white"
                           }`}
                         >
-                          <span className="flex items-center gap-2.5">
+                          <span className="flex items-center gap-2.5 text-left">
                             <Icon className="h-4 w-4" />
                             {m.label}
                           </span>
@@ -534,7 +536,7 @@ function AppContent() {
 
             {/* Quick Simulation Controller at Bottom of Sidebar */}
             <div className="p-4 border-t border-[#262626] space-y-2.5 bg-[#0f0f0f]/30">
-              <span className="text-[9px] text-gray-500 font-extrabold block uppercase tracking-wider">SIMULATION UTILITIES</span>
+              <span className="text-[9px] text-gray-500 font-extrabold block uppercase tracking-wider font-sans">SIMULATION UTILITIES</span>
               <button
                 onClick={() => {
                   if (window.confirm("Khôi phục toàn bộ database về hạt giống dữ liệu gốc ban đầu?")) {
@@ -648,15 +650,19 @@ function AppContent() {
                       <InventoryModule />
                     )}
 
+                    {isAllowed("hr") && activeAdminModule === "hr" && (
+                      <HrModule
+                        staff={staff}
+                        orders={orders}
+                        currentUser={currentUser}
+                      />
+                    )}
+
                     {activeAdminModule === "system" && isModuleVisible("system") && (
                       <div className="space-y-6">
                         {/* Module 7 Header */}
                         <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 bg-white border border-[#e5e5e5] p-6 rounded-2xl shadow-sm">
                           <div>
-                            <div className="flex items-center gap-2 text-forest-green font-sans text-xs font-bold tracking-wider uppercase mb-1">
-                              <span className="h-1.5 w-1.5 rounded-full bg-brand-green animate-pulse" />
-                              Hệ Thống Trạm · Module 7: Quản Trị Hệ Thống & Cài Đặt
-                            </div>
                             <h1 className="text-3xl font-extrabold tracking-tight text-matte-black font-display uppercase">THIẾT LẬP HỆ THỐNG</h1>
                             <p className="text-mid-gray text-sm mt-1 font-sans">
                               Quản lý nhân sự, cấu hình quyền hạn (RBAC), kiểm toán bảo mật, quản trị CRM Khách hàng và giám sát IoT
@@ -784,10 +790,6 @@ function AdminDashboardView({ orders, revenueStats, booths, staff, vouchers }: A
       {/* MODULE HEADER AND QUICK ACTIONS */}
       <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 bg-white border border-[#e5e5e5] p-6 rounded-2xl shadow-sm">
         <div>
-          <div className="flex items-center gap-2 text-forest-green font-sans text-xs font-bold tracking-wider uppercase mb-1">
-            <span className="h-1.5 w-1.5 rounded-full bg-brand-green animate-ping" />
-            Vận Hành Trực Tuyến · Module 1: Dashboard & Live Operations
-          </div>
           <h1 className="text-3xl font-extrabold tracking-tight text-matte-black font-display uppercase">BÀN ĐIỀU PHỐI WASSUP</h1>
           <p className="text-mid-gray text-sm mt-1 font-sans">Đồng bộ hàng chờ thời gian thực, quản lý buồng rửa xe và giám sát mục tiêu doanh thu</p>
         </div>
@@ -1012,7 +1014,7 @@ function AdminDashboardView({ orders, revenueStats, booths, staff, vouchers }: A
                       <div className="flex justify-between items-center bg-warm-white p-3 rounded-xl border border-[#e5e5e5]">
                         <div>
                           <span className="text-[10px] font-sans font-extrabold text-mid-gray block uppercase">Biển số xe</span>
-                          <span className="text-base font-extrabold text-matte-black tracking-wider">
+                          <span className="text-base font-extrabold font-sans text-matte-black tracking-wider">
                             {activeWo.licensePlate}
                           </span>
                         </div>
@@ -1168,7 +1170,7 @@ function AdminDashboardView({ orders, revenueStats, booths, staff, vouchers }: A
                           wo.status === 'done' ? "opacity-55" : ""
                         }`}
                       >
-                        <td className="p-4 font-extrabold text-matte-black tracking-wider text-sm">{wo.licensePlate}</td>
+                        <td className="p-4 font-extrabold text-matte-black tracking-wider text-sm font-sans">{wo.licensePlate}</td>
                         <td className="p-4 capitalize text-mid-gray font-sans font-medium">{wo.vehicleSegment}</td>
                         <td className="p-4">
                           <span className="inline-flex items-center px-2.5 py-1 rounded bg-brand-green text-matte-black font-extrabold text-[11px] font-sans">
@@ -1318,12 +1320,12 @@ function AdminDashboardView({ orders, revenueStats, booths, staff, vouchers }: A
               Hệ thống WASSUP OS đồng bộ trạng thái Web-View này song song với <strong>Telegram Bot KTV</strong>. Khi KTV cập nhật trạng thái rửa xe trên Bot điện thoại, bảng Admin Dashboard này sẽ tự động tải lại trạng thái Realtime mới nhất.
             </p>
             <div className="pt-2 flex justify-between gap-2 border-t border-[#3a3a3a]">
-              <span className="text-[10px] text-gray-500">Bot Webhook:</span>
-              <span className="text-[10px] text-brand-green">/api/telegram/webhook</span>
+              <span className="text-[10px] font-sans text-gray-500">Bot Webhook:</span>
+              <span className="text-[10px] font-sans text-brand-green">/api/telegram/webhook</span>
             </div>
             <div className="flex justify-between gap-2">
-              <span className="text-[10px] text-gray-500">DB Schema View:</span>
-              <span className="text-[10px] text-brand-green">order_status_view</span>
+              <span className="text-[10px] font-sans text-gray-500">DB Schema View:</span>
+              <span className="text-[10px] font-sans text-brand-green">order_status_view</span>
             </div>
           </div>
         </div>

@@ -18,6 +18,7 @@ import {
   AlertTriangle
 } from "lucide-react";
 import { OrderStatusView } from "../../types/workOrder.types";
+import { MarkdownTextarea, MarkdownRenderer } from "./shared/Markdown";
 
 interface FinanceRecord {
   id: string;
@@ -249,6 +250,17 @@ export default function FinanceModule() {
     }
   };
 
+  const formatNumberWithDot = (val: string | number) => {
+    if (val === undefined || val === null || val === "") return "";
+    const clean = String(val).replace(/\D/g, "");
+    if (!clean) return "";
+    return Number(clean).toLocaleString("vi-VN");
+  };
+
+  const parseNumberFromDot = (val: string) => {
+    return val.replace(/\D/g, "");
+  };
+
   // Filter logic
   const filteredLedger = ledger.filter(r => {
     const matchesTab = activeTab === "all" || r.type === activeTab;
@@ -290,8 +302,8 @@ export default function FinanceModule() {
         <div className="bg-white border border-stone-200 rounded-2xl p-5 flex items-center justify-between shadow-sm relative overflow-hidden">
           <div className="space-y-1">
             <span className="text-[10px] text-stone-500 font-extrabold uppercase font-sans tracking-wider block">Tổng Thu (Inflow Cash)</span>
-            <span className="text-xl font-black text-emerald-600 block">
-              {totalIncome.toLocaleString()} <span className="text-xs font-normal">đ</span>
+            <span className="text-xl font-black font-sans text-emerald-600 block">
+              {totalIncome.toLocaleString("vi-VN")} <span className="text-xs font-normal">đ</span>
             </span>
             <span className="text-[10px] text-stone-400 block font-sans">Đã bao gồm doanh thu từ POS và sảnh chờ</span>
           </div>
@@ -305,8 +317,8 @@ export default function FinanceModule() {
         <div className="bg-white border border-stone-200 rounded-2xl p-5 flex items-center justify-between shadow-sm relative overflow-hidden">
           <div className="space-y-1">
             <span className="text-[10px] text-stone-500 font-extrabold uppercase font-sans tracking-wider block">Tổng Chi (Outflow Cash)</span>
-            <span className="text-xl font-black text-red-600 block">
-              {totalExpense.toLocaleString()} <span className="text-xs font-normal">đ</span>
+            <span className="text-xl font-black font-sans text-red-600 block">
+              {totalExpense.toLocaleString("vi-VN")} <span className="text-xs font-normal">đ</span>
             </span>
             <span className="text-[10px] text-stone-400 block font-sans">Lương thưởng, điện nước & hóa chất kho</span>
           </div>
@@ -320,8 +332,8 @@ export default function FinanceModule() {
         <div className="bg-white border border-stone-200 rounded-2xl p-5 flex items-center justify-between shadow-sm relative overflow-hidden">
           <div className="space-y-1">
             <span className="text-[10px] text-stone-500 font-extrabold uppercase font-sans tracking-wider block">Lợi Nhuận Thuần (Net Operating Income)</span>
-            <span className={`text-xl font-black block ${netProfit >= 0 ? "text-forest-green" : "text-amber-600"}`}>
-              {netProfit.toLocaleString()} <span className="text-xs font-normal">đ</span>
+            <span className={`text-xl font-black font-sans block ${netProfit >= 0 ? "text-forest-green" : "text-amber-600"}`}>
+              {netProfit.toLocaleString("vi-VN")} <span className="text-xs font-normal">đ</span>
             </span>
             <span className="text-[10px] text-stone-400 block font-sans">Hiệu quả tài chính thời gian thực</span>
           </div>
@@ -407,7 +419,7 @@ export default function FinanceModule() {
               ) : (
                 filteredLedger.map((row) => (
                   <tr key={row.id} className="hover:bg-warm-white/50 transition-colors">
-                    <td className="p-4 text-stone-500">
+                    <td className="p-4 text-stone-500 font-sans font-semibold">
                       <span className="flex items-center gap-1.5">
                         <Calendar className="h-3.5 w-3.5 text-stone-400" />
                         {new Date(row.date).toLocaleDateString("vi-VN", {
@@ -421,7 +433,7 @@ export default function FinanceModule() {
                     </td>
                     <td className="p-4 font-bold text-matte-black max-w-xs truncate" title={row.title}>
                       <div>{row.title}</div>
-                      {row.notes && <div className="text-[10px] text-stone-400 font-normal italic">{row.notes}</div>}
+                      {row.notes && <MarkdownRenderer text={row.notes} className="text-[10px] text-stone-400 font-normal italic mt-0.5" />}
                     </td>
                     <td className="p-4">
                       <span className={`inline-flex items-center px-2 py-0.5 rounded text-[10px] font-extrabold font-sans border uppercase ${
@@ -434,10 +446,10 @@ export default function FinanceModule() {
                     </td>
                     <td className="p-4 text-stone-600 font-medium">{row.paymentMethodLabel}</td>
                     <td className="p-4 text-stone-700">{row.actor}</td>
-                    <td className={`p-4 text-right font-black text-xs ${
+                    <td className={`p-4 text-right font-sans font-black text-xs ${
                       row.type === "income" ? "text-emerald-600" : "text-red-600"
                     }`}>
-                      {row.type === "income" ? "+" : "-"}{row.amount.toLocaleString()} đ
+                      {row.type === "income" ? "+" : "-"}{row.amount.toLocaleString("vi-VN")} đ
                     </td>
                     <td className="p-4 text-center">
                       <button
@@ -550,14 +562,12 @@ export default function FinanceModule() {
                   <div className="space-y-1">
                     <label className="font-extrabold text-stone-700 uppercase block tracking-wider text-[9px]">Số tiền giao dịch (VND)</label>
                     <input
-                      type="number"
+                      type="text"
                       required
-                      min="1000"
-                      step="1000"
-                      placeholder="ví dụ: 250000"
-                      value={amount}
-                      onChange={(e) => setAmount(e.target.value)}
-                      className="w-full bg-stone-50 border border-stone-200 rounded-xl px-3 py-2.5 text-xs text-matte-black focus:outline-none focus:border-brand-green focus:bg-white"
+                      placeholder="ví dụ: 250.000"
+                      value={formatNumberWithDot(amount)}
+                      onChange={(e) => setAmount(parseNumberFromDot(e.target.value))}
+                      className="w-full bg-stone-50 border border-stone-200 rounded-xl px-3 py-2.5 text-xs font-sans font-semibold text-matte-black focus:outline-none focus:border-brand-green focus:bg-white"
                     />
                   </div>
 
@@ -621,12 +631,12 @@ export default function FinanceModule() {
                 {/* NOTES */}
                 <div className="space-y-1">
                   <label className="font-extrabold text-stone-700 uppercase block tracking-wider text-[9px]">Ghi chú chứng từ (Không bắt buộc)</label>
-                  <textarea
-                    rows={2}
+                  <MarkdownTextarea
+                    id="finance-notes"
                     placeholder="Nhập mã hóa đơn, số chứng từ, hoặc người nhận chi tiết..."
                     value={notes}
-                    onChange={(e) => setNotes(e.target.value)}
-                    className="w-full bg-stone-50 border border-stone-200 rounded-xl px-3 py-2 text-xs focus:outline-none focus:border-brand-green focus:bg-white"
+                    onChange={(val) => setNotes(val)}
+                    rows={2}
                   />
                 </div>
 

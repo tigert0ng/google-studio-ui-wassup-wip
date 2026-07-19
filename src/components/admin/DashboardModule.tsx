@@ -436,7 +436,7 @@ export default function DashboardModule({
                     <div className="flex justify-between items-center bg-warm-white p-3 rounded-xl border border-[#e5e5e5]">
                       <div>
                         <span className="text-[10px] font-sans font-extrabold text-mid-gray block uppercase">Biển số xe</span>
-                        <span className="text-base font-extrabold text-matte-black tracking-wider">
+                        <span className="text-base font-extrabold font-mono text-matte-black tracking-wider">
                           {activeWo.licensePlate}
                         </span>
                       </div>
@@ -590,7 +590,7 @@ export default function DashboardModule({
                       : "hover:bg-warm-white/50"
                   }`}
                 >
-                  <td className="p-3.5 font-extrabold text-matte-black text-sm">{mix.code}</td>
+                  <td className="p-3.5 font-extrabold text-matte-black font-mono text-sm">{mix.code}</td>
                   <td className="p-3.5 font-bold text-center text-sm">{mix.count} xe</td>
                   <td className="p-3.5 font-black text-center text-sm">{mix.percentage}%</td>
                   <td className="p-3.5 font-medium text-center text-sm text-mid-gray">{mix.ideal}%</td>
