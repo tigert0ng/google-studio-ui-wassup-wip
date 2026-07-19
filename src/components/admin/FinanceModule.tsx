@@ -290,7 +290,7 @@ export default function FinanceModule() {
         <div className="bg-white border border-stone-200 rounded-2xl p-5 flex items-center justify-between shadow-sm relative overflow-hidden">
           <div className="space-y-1">
             <span className="text-[10px] text-stone-500 font-extrabold uppercase font-sans tracking-wider block">Tổng Thu (Inflow Cash)</span>
-            <span className="text-xl font-black font-mono text-emerald-600 block">
+            <span className="text-xl font-black text-emerald-600 block">
               {totalIncome.toLocaleString()} <span className="text-xs font-normal">đ</span>
             </span>
             <span className="text-[10px] text-stone-400 block font-sans">Đã bao gồm doanh thu từ POS và sảnh chờ</span>
@@ -305,7 +305,7 @@ export default function FinanceModule() {
         <div className="bg-white border border-stone-200 rounded-2xl p-5 flex items-center justify-between shadow-sm relative overflow-hidden">
           <div className="space-y-1">
             <span className="text-[10px] text-stone-500 font-extrabold uppercase font-sans tracking-wider block">Tổng Chi (Outflow Cash)</span>
-            <span className="text-xl font-black font-mono text-red-600 block">
+            <span className="text-xl font-black text-red-600 block">
               {totalExpense.toLocaleString()} <span className="text-xs font-normal">đ</span>
             </span>
             <span className="text-[10px] text-stone-400 block font-sans">Lương thưởng, điện nước & hóa chất kho</span>
@@ -320,7 +320,7 @@ export default function FinanceModule() {
         <div className="bg-white border border-stone-200 rounded-2xl p-5 flex items-center justify-between shadow-sm relative overflow-hidden">
           <div className="space-y-1">
             <span className="text-[10px] text-stone-500 font-extrabold uppercase font-sans tracking-wider block">Lợi Nhuận Thuần (Net Operating Income)</span>
-            <span className={`text-xl font-black font-mono block ${netProfit >= 0 ? "text-forest-green" : "text-amber-600"}`}>
+            <span className={`text-xl font-black block ${netProfit >= 0 ? "text-forest-green" : "text-amber-600"}`}>
               {netProfit.toLocaleString()} <span className="text-xs font-normal">đ</span>
             </span>
             <span className="text-[10px] text-stone-400 block font-sans">Hiệu quả tài chính thời gian thực</span>
@@ -407,7 +407,7 @@ export default function FinanceModule() {
               ) : (
                 filteredLedger.map((row) => (
                   <tr key={row.id} className="hover:bg-warm-white/50 transition-colors">
-                    <td className="p-4 text-stone-500 font-mono">
+                    <td className="p-4 text-stone-500">
                       <span className="flex items-center gap-1.5">
                         <Calendar className="h-3.5 w-3.5 text-stone-400" />
                         {new Date(row.date).toLocaleDateString("vi-VN", {
@@ -434,7 +434,7 @@ export default function FinanceModule() {
                     </td>
                     <td className="p-4 text-stone-600 font-medium">{row.paymentMethodLabel}</td>
                     <td className="p-4 text-stone-700">{row.actor}</td>
-                    <td className={`p-4 text-right font-mono font-black text-xs ${
+                    <td className={`p-4 text-right font-black text-xs ${
                       row.type === "income" ? "text-emerald-600" : "text-red-600"
                     }`}>
                       {row.type === "income" ? "+" : "-"}{row.amount.toLocaleString()} đ
@@ -557,7 +557,7 @@ export default function FinanceModule() {
                       placeholder="ví dụ: 250000"
                       value={amount}
                       onChange={(e) => setAmount(e.target.value)}
-                      className="w-full bg-stone-50 border border-stone-200 rounded-xl px-3 py-2.5 text-xs font-mono text-matte-black focus:outline-none focus:border-brand-green focus:bg-white"
+                      className="w-full bg-stone-50 border border-stone-200 rounded-xl px-3 py-2.5 text-xs text-matte-black focus:outline-none focus:border-brand-green focus:bg-white"
                     />
                   </div>
 

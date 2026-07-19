@@ -261,7 +261,7 @@ export default function KioskWelcome({
         {/* Local Clock & Language */}
         <div className="flex items-center gap-5">
           {/* Live Clock display */}
-          <div className="flex items-center gap-2 text-slate-600 bg-stone-50 px-3 py-1.5 rounded-xl border border-stone-100 text-xs font-mono font-bold">
+          <div className="flex items-center gap-2 text-slate-600 bg-stone-50 px-3 py-1.5 rounded-xl border border-stone-100 text-xs font-bold">
             <Clock className="h-3.5 w-3.5 text-slate-400 animate-spin-slow" />
             <span className="text-slate-700">{formatTime(currentTime)}</span>
           </div>
@@ -424,7 +424,7 @@ export default function KioskWelcome({
                   <div className="flex-1">
                     <p className="font-bold">{lookupResult.message}</p>
                     {lookupResult.customer && (
-                      <p className="text-[10px] text-emerald-600 font-mono mt-1">
+                      <p className="text-[10px] text-emerald-600 mt-1">
                         Hạng: VIP Silver • Điểm tích luỹ: {lookupResult.customer.points} PTS
                       </p>
                     )}
@@ -503,7 +503,7 @@ export default function KioskWelcome({
       </div>
 
       {/* Trust & Guarantee Banner */}
-      <div className="bg-stone-50 border-t border-stone-150 px-8 py-4 flex flex-col sm:flex-row items-center justify-between text-[10px] font-mono text-slate-400 font-semibold gap-3">
+      <div className="bg-stone-50 border-t border-stone-150 px-8 py-4 flex flex-col sm:flex-row items-center justify-between text-[10px] text-slate-400 font-semibold gap-3">
         <span className="uppercase tracking-wider">
           ● WASSUP AUTOMATION INFRASTRUCTURE v3.4.1
         </span>
@@ -603,7 +603,7 @@ export default function KioskWelcome({
                           value={regPlate}
                           onChange={(e) => setRegPlate(e.target.value)}
                           placeholder="51G-12345"
-                          className="w-full pl-10 pr-4 py-2.5 bg-stone-50 border border-stone-200 rounded-xl font-mono text-xs focus:ring-2 focus:ring-[#A2C62C]/30 focus:outline-none focus:bg-white transition uppercase"
+                          className="w-full pl-10 pr-4 py-2.5 bg-stone-50 border border-stone-200 rounded-xl text-xs focus:ring-2 focus:ring-[#A2C62C]/30 focus:outline-none focus:bg-white transition uppercase"
                         />
                       </div>
                     </div>

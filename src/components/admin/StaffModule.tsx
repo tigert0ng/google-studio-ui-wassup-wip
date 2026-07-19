@@ -516,16 +516,16 @@ export default function StaffModule({ staff, orders }: StaffModuleProps) {
                           </div>
                           <div>
                             <p className="font-extrabold text-matte-black">{s.name}</p>
-                            <span className="text-[9px] text-mid-gray font-mono block uppercase">ID: {s.id}</span>
+                            <span className="text-[9px] text-mid-gray block uppercase">ID: {s.id}</span>
                           </div>
                         </div>
                       </td>
 
                       {/* Phone */}
-                      <td className="p-4 font-mono font-bold text-mid-gray text-sm">{s.phone}</td>
+                      <td className="p-4 font-bold text-mid-gray text-sm">{s.phone}</td>
 
                       {/* PIN Code */}
-                      <td className="p-4 font-mono font-bold text-purple-600 text-sm">
+                      <td className="p-4 font-bold text-purple-600 text-sm">
                         {s.pin || "123456"}
                       </td>
 
@@ -606,7 +606,7 @@ export default function StaffModule({ staff, orders }: StaffModuleProps) {
             <ShieldAlert className="h-4.5 w-4.5 text-purple-600" />
             SỔ NHẬT KÝ BẢO MẬT & KIỂM TOÁN (AUDIT TRAIL LOGS)
           </h3>
-          <span className="text-[10px] font-mono text-mid-gray uppercase font-semibold">
+          <span className="text-[10px] text-mid-gray uppercase font-semibold">
             Thời gian thực hành vi quản trị
           </span>
         </div>
@@ -633,7 +633,7 @@ export default function StaffModule({ staff, orders }: StaffModuleProps) {
                 </div>
                 <p className="text-mid-gray leading-relaxed">{log.details}</p>
               </div>
-              <span className="font-mono text-[9px] text-mid-gray shrink-0 self-end sm:self-center">
+              <span className="text-[9px] text-mid-gray shrink-0 self-end sm:self-center">
                 {new Date(log.timestamp).toLocaleTimeString("vi-VN")} - {new Date(log.timestamp).toLocaleDateString("vi-VN")}
               </span>
             </div>
@@ -712,7 +712,7 @@ export default function StaffModule({ staff, orders }: StaffModuleProps) {
                   placeholder="Mặc định: 123456"
                   value={addForm.pin}
                   onChange={(e) => setAddForm({ ...addForm, pin: e.target.value })}
-                  className="w-full bg-white border border-[#e5e5e5] rounded-xl px-3.5 py-2.5 text-xs font-mono font-bold tracking-widest text-matte-black focus:outline-none focus:border-purple-500"
+                  className="w-full bg-white border border-[#e5e5e5] rounded-xl px-3.5 py-2.5 text-xs font-bold tracking-widest text-matte-black focus:outline-none focus:border-purple-500"
                 />
               </div>
 
@@ -810,7 +810,7 @@ export default function StaffModule({ staff, orders }: StaffModuleProps) {
                   placeholder="Ví dụ: 123456"
                   value={editForm.pin}
                   onChange={(e) => setEditForm({ ...editForm, pin: e.target.value })}
-                  className="w-full bg-white border border-[#e5e5e5] rounded-xl px-3.5 py-2.5 text-xs font-mono font-bold tracking-widest text-matte-black focus:outline-none focus:border-purple-500"
+                  className="w-full bg-white border border-[#e5e5e5] rounded-xl px-3.5 py-2.5 text-xs font-bold tracking-widest text-matte-black focus:outline-none focus:border-purple-500"
                 />
               </div>
 

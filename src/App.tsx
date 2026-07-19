@@ -374,7 +374,7 @@ function AppContent() {
 
               {/* Simulation bottom utility inside drawer */}
               <div className="p-5 border-t border-[#262626] space-y-2.5 bg-[#0f0f0f]/30">
-                <span className="text-[9px] text-gray-500 font-extrabold block uppercase tracking-wider font-mono">SIMULATION UTILITIES</span>
+                <span className="text-[9px] text-gray-500 font-extrabold block uppercase tracking-wider">SIMULATION UTILITIES</span>
                 <button
                   onClick={() => {
                     if (window.confirm("Khôi phục toàn bộ database về hạt giống dữ liệu gốc ban đầu?")) {
@@ -534,7 +534,7 @@ function AppContent() {
 
             {/* Quick Simulation Controller at Bottom of Sidebar */}
             <div className="p-4 border-t border-[#262626] space-y-2.5 bg-[#0f0f0f]/30">
-              <span className="text-[9px] text-gray-500 font-extrabold block uppercase tracking-wider font-mono">SIMULATION UTILITIES</span>
+              <span className="text-[9px] text-gray-500 font-extrabold block uppercase tracking-wider">SIMULATION UTILITIES</span>
               <button
                 onClick={() => {
                   if (window.confirm("Khôi phục toàn bộ database về hạt giống dữ liệu gốc ban đầu?")) {
@@ -1012,7 +1012,7 @@ function AdminDashboardView({ orders, revenueStats, booths, staff, vouchers }: A
                       <div className="flex justify-between items-center bg-warm-white p-3 rounded-xl border border-[#e5e5e5]">
                         <div>
                           <span className="text-[10px] font-sans font-extrabold text-mid-gray block uppercase">Biển số xe</span>
-                          <span className="text-base font-extrabold font-mono text-matte-black tracking-wider">
+                          <span className="text-base font-extrabold text-matte-black tracking-wider">
                             {activeWo.licensePlate}
                           </span>
                         </div>
@@ -1168,7 +1168,7 @@ function AdminDashboardView({ orders, revenueStats, booths, staff, vouchers }: A
                           wo.status === 'done' ? "opacity-55" : ""
                         }`}
                       >
-                        <td className="p-4 font-extrabold text-matte-black tracking-wider text-sm font-mono">{wo.licensePlate}</td>
+                        <td className="p-4 font-extrabold text-matte-black tracking-wider text-sm">{wo.licensePlate}</td>
                         <td className="p-4 capitalize text-mid-gray font-sans font-medium">{wo.vehicleSegment}</td>
                         <td className="p-4">
                           <span className="inline-flex items-center px-2.5 py-1 rounded bg-brand-green text-matte-black font-extrabold text-[11px] font-sans">
@@ -1318,12 +1318,12 @@ function AdminDashboardView({ orders, revenueStats, booths, staff, vouchers }: A
               Hệ thống WASSUP OS đồng bộ trạng thái Web-View này song song với <strong>Telegram Bot KTV</strong>. Khi KTV cập nhật trạng thái rửa xe trên Bot điện thoại, bảng Admin Dashboard này sẽ tự động tải lại trạng thái Realtime mới nhất.
             </p>
             <div className="pt-2 flex justify-between gap-2 border-t border-[#3a3a3a]">
-              <span className="text-[10px] font-mono text-gray-500">Bot Webhook:</span>
-              <span className="text-[10px] font-mono text-brand-green">/api/telegram/webhook</span>
+              <span className="text-[10px] text-gray-500">Bot Webhook:</span>
+              <span className="text-[10px] text-brand-green">/api/telegram/webhook</span>
             </div>
             <div className="flex justify-between gap-2">
-              <span className="text-[10px] font-mono text-gray-500">DB Schema View:</span>
-              <span className="text-[10px] font-mono text-brand-green">order_status_view</span>
+              <span className="text-[10px] text-gray-500">DB Schema View:</span>
+              <span className="text-[10px] text-brand-green">order_status_view</span>
             </div>
           </div>
         </div>

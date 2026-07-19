@@ -162,7 +162,7 @@ export default function KtvModule({ orders, staff }: KtvModuleProps) {
               </div>
               <div>
                 <h2 className="font-display font-black text-xs text-white uppercase tracking-wider">WORKSPACE KTV</h2>
-                <span className="text-[9px] text-[#A2C62C] uppercase block font-mono font-bold tracking-widest">Wassup Mobile OS</span>
+                <span className="text-[9px] text-[#A2C62C] uppercase block font-bold tracking-widest">Wassup Mobile OS</span>
               </div>
             </div>
 
@@ -216,7 +216,7 @@ export default function KtvModule({ orders, staff }: KtvModuleProps) {
               </div>
 
               <div className="text-right space-y-1">
-                <span className="inline-flex items-center px-2 py-0.5 rounded bg-[#1f2d08] text-[#A2C62C] border border-[#3e5910] text-[9px] font-black uppercase tracking-wider font-mono">
+                <span className="inline-flex items-center px-2 py-0.5 rounded bg-[#1f2d08] text-[#A2C62C] border border-[#3e5910] text-[9px] font-black uppercase tracking-wider">
                   {assignedTasks.length > 0 ? "🟢 ĐANG THI CÔNG" : "⚪ CHỜ ĐIỀU PHỐI"}
                 </span>
                 <div className="text-[9px] text-gray-400">
@@ -269,7 +269,7 @@ export default function KtvModule({ orders, staff }: KtvModuleProps) {
                           ĐANG THI CÔNG DỞ DANG
                         </span>
                         <div className="flex items-center gap-2">
-                          <span className="text-base font-black text-matte-black tracking-widest font-mono">
+                          <span className="text-base font-black text-matte-black tracking-widest">
                             {activeTask.licensePlate}
                           </span>
                           <span className="inline-flex px-1.5 py-0.5 rounded bg-brand-green text-matte-black font-black text-[9px]">
@@ -310,7 +310,7 @@ export default function KtvModule({ orders, staff }: KtvModuleProps) {
                               <div className="flex items-start justify-between">
                                 <div className="space-y-1">
                                   <div className="flex items-center gap-2">
-                                    <span className="text-base font-black text-matte-black tracking-widest font-mono">
+                                    <span className="text-base font-black text-matte-black tracking-widest">
                                       {t.licensePlate}
                                     </span>
                                     <span className="inline-flex px-2 py-0.5 rounded bg-[#A2C62C] text-matte-black font-black text-[9px] font-sans">
@@ -381,7 +381,7 @@ export default function KtvModule({ orders, staff }: KtvModuleProps) {
                   <div className="flex justify-between items-start">
                     <div>
                       <span className="text-[9px] text-gray-400 block font-bold uppercase tracking-wider">Biển Số Xe Thi Công</span>
-                      <span className="text-xl font-black font-mono tracking-widest text-[#A2C62C]">{selectedTask.licensePlate}</span>
+                      <span className="text-xl font-black tracking-widest text-[#A2C62C]">{selectedTask.licensePlate}</span>
                     </div>
                     <div className="text-right">
                       <span className="text-[9px] text-gray-400 block font-bold uppercase tracking-wider">Gói rửa xe</span>
@@ -393,7 +393,7 @@ export default function KtvModule({ orders, staff }: KtvModuleProps) {
 
                   <div className="flex justify-between items-center text-[10px] text-gray-300 font-sans border-t border-zinc-800 pt-3">
                     <span>Phân khúc: <strong className="uppercase text-white">{selectedTask.vehicleSegment}</strong></span>
-                    <span className="flex items-center gap-1 text-[#A2C62C] font-bold uppercase tracking-wider font-mono">
+                    <span className="flex items-center gap-1 text-[#A2C62C] font-bold uppercase tracking-wider">
                       <Activity className="h-3.5 w-3.5" /> {
                         selectedTask.status === "assigned" ? "ĐÃ GÁN" :
                         selectedTask.status === "in_progress" ? "ĐANG THI CÔNG" :
@@ -414,14 +414,14 @@ export default function KtvModule({ orders, staff }: KtvModuleProps) {
                   <div className="grid grid-cols-2 gap-3 text-xs font-sans">
                     <div className="p-2.5 bg-stone-50 rounded-xl space-y-1">
                       <span className="text-[9px] text-mid-gray uppercase block font-bold">Thời gian quy chuẩn</span>
-                      <span className="text-sm font-black text-matte-black font-mono">
+                      <span className="text-sm font-black text-matte-black">
                         {getStandardDuration(selectedTask.packageCode)} Phút
                       </span>
                     </div>
 
                     <div className="p-2.5 bg-stone-50 rounded-xl space-y-1">
                       <span className="text-[9px] text-mid-gray uppercase block font-bold">Thời gian phải hoàn thành</span>
-                      <span className={`text-sm font-black font-mono block ${
+                      <span className={`text-sm font-black block ${
                         selectedTask.status === "in_progress" ? "text-amber-600" : "text-stone-800"
                       }`}>
                         {selectedTask.status === "in_progress" ? (

@@ -385,7 +385,7 @@ export default function KioskStepsManager() {
                     }`}
                   />
                   <span
-                    className={`text-[9px] font-mono font-black mt-2 tracking-wider uppercase transition-all duration-300 ${
+                    className={`text-[9px] font-black mt-2 tracking-wider uppercase transition-all duration-300 ${
                       isActive
                         ? "text-slate-950 scale-105"
                         : isCompletedOrActive
@@ -551,7 +551,7 @@ export default function KioskStepsManager() {
                             key={item.p}
                             type="button"
                             onClick={() => dispatch({ type: 'SET_VEHICLE', payload: { plate: item.p, segment: item.seg } })}
-                            className="px-3.5 py-2 rounded-xl border border-stone-200 bg-stone-50 hover:bg-stone-100 hover:border-stone-300 text-xs font-mono font-black text-slate-700 transition cursor-pointer"
+                            className="px-3.5 py-2 rounded-xl border border-stone-200 bg-stone-50 hover:bg-stone-100 hover:border-stone-300 text-xs font-black text-slate-700 transition cursor-pointer"
                           >
                             {item.p}
                           </button>
@@ -605,7 +605,7 @@ export default function KioskStepsManager() {
                     Giá gói đã tự động quy chuẩn cho xe cỡ <strong>{state.segment === 'sedan' ? "4-5 Chỗ" : "7-9 Chỗ (+30%)"}</strong>
                   </p>
                 </div>
-                <div className="px-3.5 py-1.5 bg-slate-900 text-[#A2C62C] font-mono font-black text-xs rounded uppercase tracking-wider">
+                <div className="px-3.5 py-1.5 bg-slate-900 text-[#A2C62C] font-black text-xs rounded uppercase tracking-wider">
                   BIỂN SỐ: {state.plate}
                 </div>
               </div>
@@ -647,7 +647,7 @@ export default function KioskStepsManager() {
 
                       <div className="space-y-2.5">
                         <div className="flex items-center justify-between">
-                          <span className="px-2 py-0.5 bg-slate-100 border border-slate-200 rounded font-mono font-bold text-[9px] text-slate-600">
+                          <span className="px-2 py-0.5 bg-slate-100 border border-slate-200 rounded font-bold text-[9px] text-slate-600">
                             {pkg.code}
                           </span>
                           {isSelected && hasBomLine && (
@@ -834,7 +834,7 @@ export default function KioskStepsManager() {
                         placeholder="MÃ GIẢM GIÁ"
                         value={promoInput}
                         onChange={(e) => setPromoInput(e.target.value.toUpperCase())}
-                        className="flex-1 px-4 py-3 text-sm font-mono font-black uppercase rounded-xl border border-stone-200 focus:ring-2 focus:ring-[#A2C62C]/20 focus:outline-none"
+                        className="flex-1 px-4 py-3 text-sm font-black uppercase rounded-xl border border-stone-200 focus:ring-2 focus:ring-[#A2C62C]/20 focus:outline-none"
                       />
                       <button
                         type="button"
@@ -875,8 +875,8 @@ export default function KioskStepsManager() {
                   <div className="bg-[#f8fafc] border border-slate-200 p-4 rounded-xl space-y-2">
                     <span className="text-[10px] font-black text-slate-900 uppercase tracking-wider block">GỢI Ý MÃ HOT HÔM NAY 🔥</span>
                     <ul className="text-[11px] text-slate-500 space-y-1 font-sans">
-                      <li>• <strong className="text-slate-800 font-mono">VIP30</strong>: Giảm ngay 30% toàn bộ dịch vụ rửa chính & phụ trợ.</li>
-                      <li>• <strong className="text-slate-800 font-mono">WASSUP100</strong>: Giảm trừ trực tiếp 100.000đ khi trải nghiệm lần đầu.</li>
+                      <li>• <strong className="text-slate-800">VIP30</strong>: Giảm ngay 30% toàn bộ dịch vụ rửa chính & phụ trợ.</li>
+                      <li>• <strong className="text-slate-800">WASSUP100</strong>: Giảm trừ trực tiếp 100.000đ khi trải nghiệm lần đầu.</li>
                     </ul>
                   </div>
                 </div>
@@ -1097,10 +1097,10 @@ export default function KioskStepsManager() {
                     THEO DÕI TIẾN TRÌNH THỜI GIAN THỰC
                   </h2>
                   <p className="text-xs text-slate-500 mt-0.5">
-                    Mã lệnh đặt: <strong className="font-mono text-slate-800">#{state.createdOrderId?.split('_')[1]?.slice(-5) || "W1039"}</strong>
+                    Mã lệnh đặt: <strong className="text-slate-800">#{state.createdOrderId?.split('_')[1]?.slice(-5) || "W1039"}</strong>
                   </p>
                 </div>
-                <div className="px-3.5 py-1.5 bg-[#A2C62C] text-slate-950 font-mono font-black text-sm rounded-lg tracking-wider">
+                <div className="px-3.5 py-1.5 bg-[#A2C62C] text-slate-950 font-black text-sm rounded-lg tracking-wider">
                   {state.plate}
                 </div>
               </div>

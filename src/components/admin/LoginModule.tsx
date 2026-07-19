@@ -229,7 +229,7 @@ export default function LoginModule({ staff, onLoginSuccess }: LoginModuleProps)
                 disabled={isLoading}
                 className={`w-full bg-stone-900 border ${
                   pinError ? "border-red-500/80 focus:border-red-500" : "border-stone-800 focus:border-brand-green"
-                } rounded-xl pl-10 pr-4 py-3 text-xs font-mono font-bold tracking-widest text-white placeholder-stone-600 focus:outline-none transition focus:bg-[#1a1a1a]`}
+                } rounded-xl pl-10 pr-4 py-3 text-xs font-bold tracking-widest text-white placeholder-stone-600 focus:outline-none transition focus:bg-[#1a1a1a]`}
               />
             </div>
           </div>
@@ -273,7 +273,7 @@ export default function LoginModule({ staff, onLoginSuccess }: LoginModuleProps)
               >
                 <div>
                   <div className="font-bold text-stone-200 truncate">{member.name}</div>
-                  <div className="text-[9px] text-stone-500 font-mono mt-0.5">{member.phone}</div>
+                  <div className="text-[9px] text-stone-500 mt-0.5">{member.phone}</div>
                 </div>
                 <span className={`px-1.5 py-0.2 rounded text-[8px] font-extrabold uppercase self-start ${getRoleColor(member.role)}`}>
                   {getRoleLabel(member.role)}

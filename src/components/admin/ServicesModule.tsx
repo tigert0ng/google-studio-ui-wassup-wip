@@ -25,11 +25,6 @@ import {
   TrendingUp,
   Sliders,
   Palette,
-  Bold,
-  Italic,
-  Underline,
-  List,
-  ListOrdered,
   Type,
   EyeOff,
   Hammer,
@@ -38,6 +33,7 @@ import {
 } from "lucide-react";
 import { Service } from "../../types/order.types";
 import { SERVICES_CATALOG, ADDONS_CATALOG } from "../../lib/services";
+import MarkdownEditor, { renderMarkdown } from "./shared/MarkdownEditor";
 
 // Define the interface for a BOM Line Item
 interface BomLine {
@@ -69,24 +65,9 @@ interface AdjustmentLog {
   updatedBy: string;
 }
 
-export const renderRichText = (text: string) => {
-  if (!text) return "";
-  let html = text
-    .replace(/&/g, "&amp;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;")
-    .replace(/&lt;u&gt;/g, "<u>")
-    .replace(/&lt;\/u&gt;/g, "</u>")
-    .replace(/&lt;span class="([^"]+)"&gt;/g, '<span class="$1">')
-    .replace(/&lt;\/span&gt;/g, "</span>")
-    .replace(/\*\*([^*]+)\*\*/g, "<strong>$1</strong>")
-    .replace(/\*([^*]+)\*/g, "<em>$1</em>")
-    .replace(/`([^`]+)`/g, "<code class='bg-gray-100 text-red-500 px-1.5 py-0.5 rounded font-mono text-[10px]'>$1</code>")
-    .replace(/\n- ([^\n]+)/g, "<br/>• $1")
-    .replace(/\n1\. ([^\n]+)/g, "<br/>1. $1")
-    .replace(/\n/g, "<br/>");
-  return html;
-};
+// Ghi chú (19/07/2026): logic render Markdown đã chuyển sang component dùng chung
+// `MarkdownEditor.tsx` (export `renderMarkdown`) theo design-ux-guidelines.md §8.2 —
+// không còn cho phép chèn `<span class="...">` tùy ý (chỉ `<u>` được whitelist).
 
 // Default Inventory items to map BOM to, in case storage is empty
 const FALLBACK_INVENTORY = [
@@ -245,76 +226,10 @@ export default function ServicesModule() {
   const [editorTab, setEditorTab] = useState<"write" | "preview" | "bom">("write");
   const [deleteConfirmCode, setDeleteConfirmCode] = useState("");
 
-  const insertFormat = (formatType: string) => {
-    const textarea = document.querySelector('form#edit-service-form textarea') as HTMLTextAreaElement;
-    if (!textarea) return;
-
-    const start = textarea.selectionStart;
-    const end = textarea.selectionEnd;
-    const text = textarea.value;
-    const selectedText = text.substring(start, end);
-
-    let replacement = "";
-    switch (formatType) {
-      case 'bold':
-        replacement = `**${selectedText || 'chữ đậm'}**`;
-        break;
-      case 'italic':
-        replacement = `*${selectedText || 'chữ nghiêng'}*`;
-        break;
-      case 'underline':
-        replacement = `<u>${selectedText || 'gạch chân'}</u>`;
-        break;
-      case 'code':
-        replacement = `\`${selectedText || 'mã nguồn'}\``;
-        break;
-      case 'bullet':
-        replacement = `\n- ${selectedText || 'mục mới'}`;
-        break;
-      case 'number':
-        replacement = `\n1. ${selectedText || 'mục mới'}`;
-        break;
-      case 'header':
-        replacement = `\n### ${selectedText || 'Tiêu đề phụ'}`;
-        break;
-      case 'color-green':
-        replacement = `<span class="text-forest-green font-bold">${selectedText || 'chữ xanh'}</span>`;
-        break;
-      case 'color-gold':
-        replacement = `<span class="text-warm-gold font-bold">${selectedText || 'chữ vàng'}</span>`;
-        break;
-      case 'color-red':
-        replacement = `<span class="text-red-500 font-bold">${selectedText || 'chữ đỏ'}</span>`;
-        break;
-      case 'template-standard':
-        replacement = `**Quy trình chuẩn**:
-- Bước 1: Vệ sinh bề mặt sâu
-- Bước 2: Thi công dưỡng chất chuyên dụng
-- Bước 3: Kiểm tra chất lượng ánh sáng kép
-
-**Cam kết**: Sạch sâu bóng loáng, an toàn 100%.`;
-        break;
-      case 'template-premium':
-        replacement = `**Dịch vụ VIP 5 sao**:
-- Phủ nano bảo vệ cao cấp
-- Khử trùng Ozone nội thất toàn diện
-- Dưỡng da/nhựa nội thất bằng dung dịch Meguiar's cao cấp
-
-*Bảo hành chính hãng 12 tháng.*`;
-        break;
-      default:
-        return;
-    }
-
-    const newValue = text.substring(0, start) + replacement + text.substring(end);
-    setEditDescription(newValue);
-    
-    // Refocus and select
-    setTimeout(() => {
-      textarea.focus();
-      textarea.setSelectionRange(start + replacement.length, start + replacement.length);
-    }, 50);
-  };
+  // Ghi chú (19/07/2026): logic chèn định dạng (bold/italic/underline/bullet) đã chuyển
+  // vào component dùng chung <MarkdownEditor> (xem shared/MarkdownEditor.tsx) — không còn
+  // hàm insertFormat cục bộ, không còn 2 nút chèn màu (color-green/color-gold) vì chèn thẳng
+  // `<span class="...">` vào nội dung là HTML tự do, vi phạm design-ux-guidelines.md §8.2.
 
   // Modals & triggers
   const [showProposalModal, setShowProposalModal] = useState(false);
@@ -766,7 +681,7 @@ export default function ServicesModule() {
                 </div>
 
                 <div className="flex items-center gap-4 w-full sm:w-auto justify-between sm:justify-end">
-                  <span className="font-mono text-forest-green font-black text-sm">
+                  <span className="text-forest-green font-black text-sm">
                     Giá đề xuất: {formatVnd(p.proposedPrice)}
                   </span>
                   
@@ -866,7 +781,7 @@ export default function ServicesModule() {
                     <div className="flex justify-between items-start gap-2 relative z-10">
                       <div>
                         <div className="flex items-center gap-1.5 flex-wrap">
-                          <span className="text-[10px] font-black font-mono tracking-wider opacity-60 uppercase">{pkg.code}</span>
+                          <span className="text-[10px] font-black tracking-wider opacity-60 uppercase">{pkg.code}</span>
                           
                           {pkg.label && (
                             <span className={`text-[9px] font-extrabold px-2 py-0.5 rounded-full uppercase tracking-widest ${badgeStyle}`}>
@@ -893,7 +808,7 @@ export default function ServicesModule() {
 
                     <p 
                       className={`text-[11px] font-sans mt-3.5 leading-relaxed relative z-10 ${textDescColor}`}
-                      dangerouslySetInnerHTML={{ __html: renderRichText(pkg.description || "Chưa có mô tả chi tiết cho gói dịch vụ tiêu chuẩn này.") }}
+                      dangerouslySetInnerHTML={{ __html: renderMarkdown(pkg.description || "Chưa có mô tả chi tiết cho gói dịch vụ tiêu chuẩn này.") }}
                     />
                   </div>
 
@@ -976,7 +891,7 @@ export default function ServicesModule() {
                       />
                       
                       <div className="absolute top-2 left-2 flex flex-col gap-1 items-start">
-                        <span className="bg-matte-black/75 backdrop-blur-sm text-white font-mono text-[8px] font-black px-1.5 py-0.5 rounded uppercase">
+                        <span className="bg-matte-black/75 backdrop-blur-sm text-white text-[8px] font-black px-1.5 py-0.5 rounded uppercase">
                           {add.code}
                         </span>
                         
@@ -1013,7 +928,7 @@ export default function ServicesModule() {
                     
                     <p 
                       className={`text-[10px] mt-1 font-sans line-clamp-2 leading-relaxed ${textDescColor}`}
-                      dangerouslySetInnerHTML={{ __html: renderRichText(add.description || "Dịch vụ thi công lẻ tăng hiệu năng bảo quản xế yêu.") }}
+                      dangerouslySetInnerHTML={{ __html: renderMarkdown(add.description || "Dịch vụ thi công lẻ tăng hiệu năng bảo quản xế yêu.") }}
                     />
                   </div>
 
@@ -1074,7 +989,7 @@ export default function ServicesModule() {
               {/* Drawer Header */}
               <div className="p-6 border-b border-[#e5e5e5] flex justify-between items-center bg-warm-white relative">
                 <div>
-                  <span className="text-[9px] font-extrabold bg-matte-black text-white px-2 py-0.5 rounded uppercase tracking-widest font-mono">
+                  <span className="text-[9px] font-extrabold bg-matte-black text-white px-2 py-0.5 rounded uppercase tracking-widest">
                     Mã: {selectedService.code}
                   </span>
                   <h3 className="text-base font-black font-display text-matte-black uppercase mt-1">
@@ -1174,7 +1089,7 @@ export default function ServicesModule() {
                           required
                           value={editPrice}
                           onChange={(e) => setEditPrice(e.target.value)}
-                          className="w-full bg-white border border-[#e5e5e5] rounded-xl pl-8 pr-3 py-2.5 text-xs font-mono text-forest-green font-bold focus:outline-none focus:border-forest-green"
+                          className="w-full bg-white border border-[#e5e5e5] rounded-xl pl-8 pr-3 py-2.5 text-xs text-forest-green font-bold focus:outline-none focus:border-forest-green"
                         />
                         <DollarSign className="absolute left-2.5 top-3 h-4 w-4 text-forest-green opacity-75" />
                       </div>
@@ -1244,65 +1159,11 @@ export default function ServicesModule() {
                         </label>
                       </div>
 
-                      {/* Formatting Toolbar */}
-                      <div className="flex flex-wrap items-center justify-between gap-1 bg-gray-50 border border-b-0 border-[#e5e5e5] rounded-t-xl px-2.5 py-1.5 shadow-2xs">
-                        <div className="flex items-center gap-1 flex-wrap">
-                          <button
-                            type="button"
-                            onClick={() => insertFormat("bold")}
-                            className="p-1 hover:bg-gray-200 rounded transition text-matte-black cursor-pointer"
-                            title="In đậm (Bold)"
-                          >
-                            <Bold className="h-3.5 w-3.5 stroke-[2.5]" />
-                          </button>
-                          <button
-                            type="button"
-                            onClick={() => insertFormat("italic")}
-                            className="p-1 hover:bg-gray-200 rounded transition text-matte-black cursor-pointer"
-                            title="In nghiêng (Italic)"
-                          >
-                            <Italic className="h-3.5 w-3.5 stroke-[2.5]" />
-                          </button>
-                          <button
-                            type="button"
-                            onClick={() => insertFormat("underline")}
-                            className="p-1 hover:bg-gray-200 rounded transition text-matte-black cursor-pointer"
-                            title="Gạch chân (Underline)"
-                          >
-                            <Underline className="h-3.5 w-3.5 stroke-[2.5]" />
-                          </button>
-                          <div className="w-px h-3.5 bg-gray-300 mx-1" />
-                          <button
-                            type="button"
-                            onClick={() => insertFormat("bullet")}
-                            className="p-1 hover:bg-gray-200 rounded transition text-matte-black cursor-pointer"
-                            title="Danh sách dấu chấm"
-                          >
-                            <List className="h-3.5 w-3.5" />
-                          </button>
-                        </div>
-
-                        <div className="flex items-center gap-1">
-                          <button
-                            type="button"
-                            onClick={() => insertFormat("color-green")}
-                            className="h-3 w-3 rounded-full bg-forest-green hover:scale-110 transition border border-white cursor-pointer"
-                            title="Xanh lá"
-                          />
-                          <button
-                            type="button"
-                            onClick={() => insertFormat("color-gold")}
-                            className="h-3 w-3 rounded-full bg-warm-gold hover:scale-110 transition border border-white cursor-pointer"
-                            title="Vàng"
-                          />
-                        </div>
-                      </div>
-
-                      <textarea
-                        rows={5}
+                      {/* Component dùng chung — design-ux-guidelines.md §8.2 */}
+                      <MarkdownEditor
                         value={editDescription}
-                        onChange={(e) => setEditDescription(e.target.value)}
-                        className="w-full bg-white border border-[#e5e5e5] px-3 py-2 text-xs text-matte-black focus:outline-none focus:border-forest-green rounded-b-xl border-t-0 min-h-[120px] resize-none"
+                        onChange={setEditDescription}
+                        rows={5}
                         placeholder="Nhập mô tả các tính năng gói dịch vụ..."
                       />
                     </div>
@@ -1318,7 +1179,7 @@ export default function ServicesModule() {
                     {editDescription ? (
                       <div 
                         className="rich-preview-container space-y-2.5"
-                        dangerouslySetInnerHTML={{ __html: renderRichText(editDescription) }}
+                        dangerouslySetInnerHTML={{ __html: renderMarkdown(editDescription) }}
                       />
                     ) : (
                       <div className="text-mid-gray italic text-center py-12">
@@ -1372,11 +1233,11 @@ export default function ServicesModule() {
                             <div key={b.itemId} className="p-3 flex items-center justify-between gap-4 bg-white hover:bg-gray-50 transition">
                               <div className="min-w-0 flex-1 space-y-0.5">
                                 <span className="font-extrabold text-matte-black block text-xs truncate">{b.itemName}</span>
-                                <span className="text-[9px] text-mid-gray font-mono block">Mã kho: {b.itemId}</span>
+                                <span className="text-[9px] text-mid-gray block">Mã kho: {b.itemId}</span>
                               </div>
 
                               <div className="text-right shrink-0">
-                                <span className="font-mono font-bold text-forest-green text-sm">
+                                <span className="font-bold text-forest-green text-sm">
                                   {b.amount}
                                 </span>
                                 <span className="text-[9px] text-mid-gray ml-1 font-bold">{b.unit}</span>
@@ -1428,7 +1289,7 @@ export default function ServicesModule() {
                               min="0.01"
                               value={bomAmountInput}
                               onChange={(e) => setBomAmountInput(e.target.value)}
-                              className="w-full bg-white border border-gray-250 rounded-lg p-2 text-xs font-mono font-bold text-center"
+                              className="w-full bg-white border border-gray-250 rounded-lg p-2 text-xs font-bold text-center"
                             />
                           </div>
 
@@ -1483,7 +1344,7 @@ export default function ServicesModule() {
                       VÙNG NGUY HIỂM: XÓA DỊCH VỤ
                     </div>
                     <p className="text-[10px] text-red-650 leading-relaxed font-sans">
-                      Vui lòng nhập mã gói <strong className="font-mono text-red-900 bg-red-100 px-1 py-0.5 rounded">{selectedService.code}</strong> để xác nhận xóa vĩnh viễn dịch vụ này.
+                      Vui lòng nhập mã gói <strong className="text-red-900 bg-red-100 px-1 py-0.5 rounded">{selectedService.code}</strong> để xác nhận xóa vĩnh viễn dịch vụ này.
                     </p>
                     <div className="flex gap-2">
                       <input
@@ -1491,7 +1352,7 @@ export default function ServicesModule() {
                         placeholder="Nhập mã gói..."
                         value={deleteConfirmCode}
                         onChange={(e) => setDeleteConfirmCode(e.target.value)}
-                        className="flex-1 bg-white border border-red-200 rounded-lg px-2.5 py-1.5 text-xs font-mono font-bold text-matte-black uppercase focus:outline-none focus:border-red-500 shadow-sm"
+                        className="flex-1 bg-white border border-red-200 rounded-lg px-2.5 py-1.5 text-xs font-bold text-matte-black uppercase focus:outline-none focus:border-red-500 shadow-sm"
                       />
                       <button
                         type="button"
@@ -1582,7 +1443,7 @@ export default function ServicesModule() {
                     placeholder="Ví dụ: W5, ADD-09"
                     value={newServiceForm.code}
                     onChange={(e) => setNewServiceForm({ ...newServiceForm, code: e.target.value.toUpperCase() })}
-                    className="w-full bg-white border border-[#e5e5e5] rounded-xl px-3.5 py-2.5 text-xs font-mono font-bold text-matte-black focus:outline-none focus:border-forest-green"
+                    className="w-full bg-white border border-[#e5e5e5] rounded-xl px-3.5 py-2.5 text-xs font-bold text-matte-black focus:outline-none focus:border-forest-green"
                   />
                 </div>
               </div>
@@ -1650,12 +1511,12 @@ export default function ServicesModule() {
                 <label className="text-[10px] font-sans text-mid-gray uppercase font-extrabold block">
                   Mô tả tính năng gói dịch vụ
                 </label>
-                <textarea
+                {/* Component dùng chung — đồng bộ với form sửa, design-ux-guidelines.md §8.2 */}
+                <MarkdownEditor
+                  value={newServiceForm.description}
+                  onChange={(v) => setNewServiceForm({ ...newServiceForm, description: v })}
                   rows={3}
                   placeholder="Nhập các chi tiết hoặc quyền lợi của khách hàng khi chọn gói này..."
-                  value={newServiceForm.description}
-                  onChange={(e) => setNewServiceForm({ ...newServiceForm, description: e.target.value })}
-                  className="w-full bg-white border border-[#e5e5e5] rounded-xl px-3.5 py-2.5 text-xs text-matte-black focus:outline-none focus:border-forest-green resize-none"
                 />
               </div>
 
