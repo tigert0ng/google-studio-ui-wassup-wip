@@ -387,10 +387,10 @@ export default function StockCounting({ items, setItems, ledger, setLedger, show
                     activeLines.map((line, idx) => (
                       <tr key={line.itemId} className="hover:bg-slate-50/50">
                         <td className="p-3 pl-4 font-bold text-slate-950">{line.itemName}</td>
-                        <td className="p-3 text-center font-mono font-medium">{line.bookQty} {line.unit}</td>
-                        <td className="p-3 text-center font-mono font-bold text-slate-900">{line.actualQty} {line.unit}</td>
+                        <td className="p-3 text-center font-sans font-medium">{line.bookQty} {line.unit}</td>
+                        <td className="p-3 text-center font-sans font-bold text-slate-900">{line.actualQty} {line.unit}</td>
                         <td className="p-3 text-center">
-                          <span className={`inline-block px-1.5 py-0.2 rounded font-mono font-black text-[10px] ${
+                          <span className={`inline-block px-1.5 py-0.2 rounded font-sans font-black text-[10px] ${
                             line.difference === 0 ? "bg-stone-100 text-slate-600" :
                             line.difference < 0 ? "bg-red-50 text-red-600 font-bold" : "bg-emerald-50 text-emerald-600 font-bold"
                           }`}>
@@ -447,7 +447,7 @@ export default function StockCounting({ items, setItems, ledger, setLedger, show
                 <div key={aud.id} className="border border-stone-200 rounded-xl p-4 space-y-2.5 hover:shadow-xs transition text-xs">
                   <div className="flex justify-between items-start">
                     <div>
-                      <strong className="text-slate-950 font-mono tracking-wide block">{aud.id}</strong>
+                      <strong className="text-slate-950 font-sans tracking-wide block">{aud.id}</strong>
                       <span className="text-[10px] text-slate-400 block font-sans">
                         Ngày: {new Date(aud.date).toLocaleString("vi-VN")}
                       </span>
@@ -472,7 +472,7 @@ export default function StockCounting({ items, setItems, ledger, setLedger, show
                           </div>
                           <div className="text-right text-[10px]">
                             <span className="block text-slate-500">Đếm: {item.actualQty} / Sách: {item.bookQty}</span>
-                            <span className={`font-black font-mono block ${
+                            <span className={`font-black font-sans block ${
                               item.difference === 0 ? "text-slate-500" :
                               item.difference < 0 ? "text-red-500" : "text-emerald-600"
                             }`}>

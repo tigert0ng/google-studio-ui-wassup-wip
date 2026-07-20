@@ -137,7 +137,7 @@ export default function InventoryReports({ items }: InventoryReportsProps) {
                     <div key={tech.ktv} className="space-y-1.5 text-xs">
                       <div className="flex justify-between items-center text-[11px]">
                         <span className="font-bold text-slate-900">{tech.ktv}</span>
-                        <div className="flex gap-2.5 font-mono">
+                        <div className="flex gap-2.5 font-sans">
                           <span className="text-slate-400">Định mức: <strong className="text-slate-700">{tech.standard} ml</strong></span>
                           <span className="text-slate-400">|</span>
                           <span className="text-slate-800">Thực tế: <strong className="text-slate-950 font-bold">{tech.actual} ml</strong></span>
@@ -246,10 +246,10 @@ export default function InventoryReports({ items }: InventoryReportsProps) {
                 {turnoverItems.map((item, idx) => (
                   <tr key={idx} className="hover:bg-slate-50/50">
                     <td className="p-3 pl-4 font-bold text-slate-950">{item.name}</td>
-                    <td className="p-3 text-right font-mono">{formatVnd(item.costOfSales)}</td>
-                    <td className="p-3 text-right font-mono">{formatVnd(item.avgInv)}</td>
-                    <td className="p-3 text-center font-mono font-extrabold text-slate-800">{item.turnover}</td>
-                    <td className="p-3 text-center font-mono font-extrabold text-slate-800">{item.days} ngày</td>
+                    <td className="p-3 text-right font-sans">{formatVnd(item.costOfSales)}</td>
+                    <td className="p-3 text-right font-sans">{formatVnd(item.avgInv)}</td>
+                    <td className="p-3 text-center font-sans font-extrabold text-slate-800">{item.turnover}</td>
+                    <td className="p-3 text-center font-sans font-extrabold text-slate-800">{item.days} ngày</td>
                     <td className="p-3 text-right pr-4">
                       <span className={`inline-block px-2.5 py-0.5 rounded-full text-[9px] font-black uppercase border ${item.style}`}>
                         {item.speed}
@@ -270,7 +270,7 @@ export default function InventoryReports({ items }: InventoryReportsProps) {
           <div className="bg-slate-900 text-white p-5 rounded-2xl shadow-sm border border-slate-800 flex flex-col justify-between">
             <div className="space-y-1">
               <span className="text-[9px] text-[#A2C62C] font-black uppercase tracking-widest block">TỔNG GIÁ TRỊ TÀI SẢN KHO</span>
-              <h4 className="text-2xl font-mono font-black text-white">{formatVnd(totalInventoryValue)}</h4>
+              <h4 className="text-2xl font-sans font-black text-white">{formatVnd(totalInventoryValue)}</h4>
             </div>
             <p className="text-[10px] text-slate-400 leading-normal pt-4 border-t border-slate-800/80 mt-4">
               Bao gồm hàng hóa thương mại bán lẻ POS, hóa chất sỉ tiêu hao và công cụ máy móc ròng sau khấu hao.
@@ -284,7 +284,7 @@ export default function InventoryReports({ items }: InventoryReportsProps) {
               <div className="space-y-1">
                 <div className="flex justify-between items-center text-[11px]">
                   <span className="font-bold text-slate-950">Hàng thương mại</span>
-                  <span className="font-mono text-slate-500">{formatVnd(totalCommercialValue)} ({((totalCommercialValue / (totalInventoryValue || 1)) * 100).toFixed(1)}%)</span>
+                  <span className="font-sans text-slate-500">{formatVnd(totalCommercialValue)} ({((totalCommercialValue / (totalInventoryValue || 1)) * 100).toFixed(1)}%)</span>
                 </div>
                 <div className="w-full h-1.5 bg-stone-100 rounded-full overflow-hidden">
                   <div className="bg-emerald-500 h-full" style={{ width: `${(totalCommercialValue / (totalInventoryValue || 1)) * 100}%` }} />
@@ -294,7 +294,7 @@ export default function InventoryReports({ items }: InventoryReportsProps) {
               <div className="space-y-1">
                 <div className="flex justify-between items-center text-[11px]">
                   <span className="font-bold text-slate-950">Vật tư tiêu hao</span>
-                  <span className="font-mono text-slate-500">{formatVnd(totalConsumableValue)} ({((totalConsumableValue / (totalInventoryValue || 1)) * 100).toFixed(1)}%)</span>
+                  <span className="font-sans text-slate-500">{formatVnd(totalConsumableValue)} ({((totalConsumableValue / (totalInventoryValue || 1)) * 100).toFixed(1)}%)</span>
                 </div>
                 <div className="w-full h-1.5 bg-stone-100 rounded-full overflow-hidden">
                   <div className="bg-blue-500 h-full" style={{ width: `${(totalConsumableValue / (totalInventoryValue || 1)) * 100}%` }} />
@@ -304,7 +304,7 @@ export default function InventoryReports({ items }: InventoryReportsProps) {
               <div className="space-y-1">
                 <div className="flex justify-between items-center text-[11px]">
                   <span className="font-bold text-slate-950">Công cụ dụng cụ ròng</span>
-                  <span className="font-mono text-slate-500">{formatVnd(totalToolValue)} ({((totalToolValue / (totalInventoryValue || 1)) * 100).toFixed(1)}%)</span>
+                  <span className="font-sans text-slate-500">{formatVnd(totalToolValue)} ({((totalToolValue / (totalInventoryValue || 1)) * 100).toFixed(1)}%)</span>
                 </div>
                 <div className="w-full h-1.5 bg-stone-100 rounded-full overflow-hidden">
                   <div className="bg-purple-600 h-full" style={{ width: `${(totalToolValue / (totalInventoryValue || 1)) * 100}%` }} />

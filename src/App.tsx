@@ -89,6 +89,7 @@ const ADMIN_MODULES = [
   { id: "crm", label: "M4: Khách Hàng & CRM", icon: Tag, category: "QUẢN TRỊ VẬN HÀNH" },
   { id: "services", label: "M5: Gói dịch vụ & Định mức (BOM)", icon: Layers, category: "DỮ LIỆU & DANH MỤC" },
   { id: "inventory", label: "M6: Kho vật tư & Hao phí", icon: Boxes, category: "DỮ LIỆU & DANH MỤC" },
+  { id: "monitor", label: "M7: IoT Monitor Giám Sát", icon: Monitor, category: "HỆ THỐNG TRẠM" },
   { id: "hr", label: "M8: Carer Performance", icon: Users, category: "HỆ THỐNG TRẠM" },
   { id: "system", label: "M0: Hệ thống & Cài đặt", icon: Settings, category: "HỆ THỐNG TRẠM" }
 ];
@@ -107,7 +108,10 @@ function AppContent() {
       const stored = localStorage.getItem("wassup_role_permissions");
       if (stored) {
         try {
-          return JSON.parse(stored);
+          const parsed = JSON.parse(stored);
+          if (parsed.master_admin && parsed.master_admin.includes("crm") && parsed.master_admin.includes("hr") && parsed.master_admin.includes("monitor") && parsed.master_admin.includes("finance")) {
+            return parsed;
+          }
         } catch (e) {}
       }
     }
@@ -257,7 +261,7 @@ function AppContent() {
     };
   }, []);
 
-  // Set up Module 7 tab layouts
+  // Set up Module 0 tab layouts (System & Staff Management)
   const allowedSubTabs = [
     {
       id: "staff",
@@ -278,12 +282,6 @@ function AppContent() {
           }}
         />
       )
-    },
-    {
-      id: "monitor",
-      label: "IoT Monitor Giám Sát",
-      icon: Monitor,
-      component: <MonitorModule />
     }
   ].filter(tab => isAllowed(tab.id));
 
@@ -656,6 +654,10 @@ function AppContent() {
                         orders={orders}
                         currentUser={currentUser}
                       />
+                    )}
+
+                    {isAllowed("monitor") && activeAdminModule === "monitor" && (
+                      <MonitorModule />
                     )}
 
                     {activeAdminModule === "system" && isModuleVisible("system") && (

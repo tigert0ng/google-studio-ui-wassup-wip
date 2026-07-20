@@ -45,16 +45,20 @@ import {
 } from "lucide-react";
 import { simActions } from "../../lib/supabase/client";
 
-// Module configurations (Module 0 to Module 7)
+// Module configurations (Module 0 to Module 8)
 const MODULE_KEYS = [
   { id: "mod0", key: "settings", name: "Module 0: Cài đặt hệ thống" },
   { id: "mod1", key: "dashboard", name: "Module 1: Dashboard điều phối" },
   { id: "mod2", key: "reception", name: "Module 2: Tiếp nhận & Kiosk" },
   { id: "mod3", key: "ktv", name: "Module 3: Buồng rửa KTV" },
   { id: "mod4", key: "pos", name: "Module 4: POS & Hóa đơn" },
+  { id: "mod4_crm", key: "crm", name: "Module 4: Khách Hàng & CRM" },
+  { id: "mod4_fin", key: "finance", name: "Module 4.5: Sổ cái Tài chính" },
   { id: "mod5", key: "services", name: "Module 5: Gói dịch vụ & BOM" },
   { id: "mod6", key: "inventory", name: "Module 6: Kho & Hao phí" },
-  { id: "mod7", key: "staff", name: "Module 7: Nhân sự & Audit log" }
+  { id: "mod7_mon", key: "monitor", name: "Module 7: IoT Monitor Giám Sát" },
+  { id: "mod7_staff", key: "staff", name: "Module 7: Nhân sự & Audit log" },
+  { id: "mod8", key: "hr", name: "Module 8: Carer Performance" }
 ];
 
 const PERMISSION_TYPES = [
@@ -97,28 +101,78 @@ export default function SettingsModule({ rolePermissions, onPermissionsChange }:
   // ---------------------------------------------------------
   // SUB-MENU 2: USER & PHÂN QUYỀN (STAFF & RBAC MATRIX)
   // ---------------------------------------------------------
-  const [staffList, setStaffList] = useState<any[]>(() => {
-    return simActions.getStaff();
+  interface UserRole {
+    key: string;
+    name: string;
+    isSystem?: boolean;
+  }
+
+  const [userRoles, setUserRoles] = useState<UserRole[]>(() => {
+    const saved = localStorage.getItem("wassup_user_roles_v2");
+    if (saved) {
+      try {
+        const parsed = JSON.parse(saved);
+        if (Array.isArray(parsed) && parsed.length > 0) {
+          return parsed;
+        }
+      } catch (e) {}
+    }
+    return [
+      { key: "master_admin", name: "Master Admin", isSystem: true },
+      { key: "manager", name: "Quản lý trạm", isSystem: true },
+      { key: "technician", name: "Kỹ thuật viên", isSystem: true },
+      { key: "accountant", name: "Kế toán", isSystem: true }
+    ];
   });
-  const [selectedRoleForMatrix, setSelectedRoleForMatrix] = useState<"master_admin" | "manager" | "technician" | "accountant">("manager");
+
+  useEffect(() => {
+    localStorage.setItem("wassup_user_roles_v2", JSON.stringify(userRoles));
+  }, [userRoles]);
+
+  const [newRoleKey, setNewRoleKey] = useState("");
+  const [newRoleName, setNewRoleName] = useState("");
+  const [showAddRoleModal, setShowAddRoleModal] = useState(false);
+
+  const [showDeleteConfirmModal, setShowDeleteConfirmModal] = useState(false);
+  const [staffToDelete, setStaffToDelete] = useState<any | null>(null);
+  const [deleteConfirmInput, setDeleteConfirmInput] = useState("");
+
+  const [showDeleteRoleModal, setShowDeleteRoleModal] = useState(false);
+  const [roleToDelete, setRoleToDelete] = useState<UserRole | null>(null);
+  const [deleteRoleConfirmInput, setDeleteRoleConfirmInput] = useState("");
+
+  const [staffList, setStaffList] = useState<any[]>(() => {
+    return simActions.getStaff().filter(s => s.role !== "technician");
+  });
+  const [selectedRoleForMatrix, setSelectedRoleForMatrix] = useState<string>("manager");
   
   // Matrix permissions: Structure: Record<Role, Record<ModuleKey, Array<"C"|"R"|"U"|"D">>>
   const [matrixPermissions, setMatrixPermissions] = useState<Record<string, Record<string, string[]>>>(() => {
     const saved = localStorage.getItem("wassup_rbac_matrix_v2");
+    let loaded: Record<string, Record<string, string[]>> = {};
     if (saved) {
-      try { return JSON.parse(saved); } catch (e) {}
+      try {
+        const parsed = JSON.parse(saved);
+        if (parsed.master_admin && parsed.master_admin.crm && parsed.master_admin.hr && parsed.master_admin.monitor && parsed.master_admin.finance) {
+          loaded = parsed;
+        }
+      } catch (e) {}
     }
-    // Default initial Matrix Permissions
-    return {
+    
+    const defaults: Record<string, Record<string, string[]>> = {
       master_admin: {
         settings: ["C", "R", "U", "D"],
         dashboard: ["C", "R", "U", "D"],
         reception: ["C", "R", "U", "D"],
         ktv: ["C", "R", "U", "D"],
         pos: ["C", "R", "U", "D"],
+        crm: ["C", "R", "U", "D"],
+        finance: ["C", "R", "U", "D"],
         services: ["C", "R", "U", "D"],
         inventory: ["C", "R", "U", "D"],
-        staff: ["C", "R", "U", "D"]
+        monitor: ["C", "R", "U", "D"],
+        staff: ["C", "R", "U", "D"],
+        hr: ["C", "R", "U", "D"]
       },
       manager: {
         settings: ["R", "U"],
@@ -126,9 +180,13 @@ export default function SettingsModule({ rolePermissions, onPermissionsChange }:
         reception: ["C", "R", "U"],
         ktv: ["C", "R", "U", "D"],
         pos: ["C", "R", "U"],
+        crm: ["C", "R", "U", "D"],
+        finance: [],
         services: ["C", "R", "U"],
         inventory: ["C", "R", "U"],
-        staff: ["R"]
+        monitor: ["C", "R", "U", "D"],
+        staff: ["R"],
+        hr: ["C", "R", "U", "D"]
       },
       technician: {
         settings: [],
@@ -136,9 +194,13 @@ export default function SettingsModule({ rolePermissions, onPermissionsChange }:
         reception: [],
         ktv: ["R", "U"],
         pos: [],
+        crm: [],
+        finance: [],
         services: ["R"],
         inventory: ["R", "U"],
-        staff: []
+        monitor: ["R", "U"],
+        staff: [],
+        hr: []
       },
       accountant: {
         settings: [],
@@ -146,11 +208,17 @@ export default function SettingsModule({ rolePermissions, onPermissionsChange }:
         reception: ["R"],
         ktv: [],
         pos: ["C", "R", "U"],
+        crm: ["C", "R", "U", "D"],
+        finance: ["C", "R", "U", "D"],
         services: ["R"],
         inventory: ["C", "R", "U"],
-        staff: ["R"]
+        staff: ["R"],
+        hr: []
       }
     };
+
+    const merged = { ...defaults, ...loaded };
+    return merged;
   });
 
   // Modal forms for adding / editing staff
@@ -161,7 +229,7 @@ export default function SettingsModule({ rolePermissions, onPermissionsChange }:
   const [staffForm, setStaffForm] = useState({
     name: "",
     phone: "",
-    role: "technician" as "master_admin" | "manager" | "technician" | "accountant",
+    role: "manager" as "master_admin" | "manager" | "technician" | "accountant",
     pin: "123456",
     telegramChatId: ""
   });
@@ -295,6 +363,10 @@ export default function SettingsModule({ rolePermissions, onPermissionsChange }:
 
   // Save Matrix RBAC Permissions
   const handleToggleMatrixPermission = (moduleKey: string, perm: string) => {
+    if (selectedRoleForMatrix === "master_admin") {
+      showToast("Không thể thay đổi quyền hạn tối cao của Master Admin!");
+      return;
+    }
     setMatrixPermissions(prev => {
       const currentRolePerms = prev[selectedRoleForMatrix] || {};
       const currentModulePerms = currentRolePerms[moduleKey] || [];
@@ -352,15 +424,11 @@ export default function SettingsModule({ rolePermissions, onPermissionsChange }:
     });
 
     if (newStaffObj) {
-      // Add extra simulation fields like telegram synchronization
-      if (staffForm.telegramChatId) {
-        localStorage.setItem(`wassup_staff_tg_${newStaffObj.id}`, staffForm.telegramChatId);
-      }
-      setStaffList(simActions.getStaff());
+      setStaffList(simActions.getStaff().filter(s => s.role !== "technician"));
       addAuditLogEntry("staff", "CREATE", `Cấp tài khoản mới cho: ${staffForm.name} (${staffForm.role})`);
       showToast(`Đã thêm nhân sự ${staffForm.name} thành công!`);
       setShowAddStaffModal(false);
-      setStaffForm({ name: "", phone: "", role: "technician", pin: "123456", telegramChatId: "" });
+      setStaffForm({ name: "", phone: "", role: "manager", pin: "123456", telegramChatId: "" });
     }
   };
 
@@ -391,12 +459,7 @@ export default function SettingsModule({ rolePermissions, onPermissionsChange }:
     });
 
     if (updated) {
-      if (staffForm.telegramChatId) {
-        localStorage.setItem(`wassup_staff_tg_${selectedStaff.id}`, staffForm.telegramChatId);
-      } else {
-        localStorage.removeItem(`wassup_staff_tg_${selectedStaff.id}`);
-      }
-      setStaffList(simActions.getStaff());
+      setStaffList(simActions.getStaff().filter(s => s.role !== "technician"));
       addAuditLogEntry("staff", "UPDATE", `Cập nhật hồ sơ tài khoản nhân sự: ${staffForm.name}`);
       showToast(`Đã cập nhật tài khoản ${staffForm.name}!`);
       setShowEditStaffModal(false);
@@ -409,10 +472,142 @@ export default function SettingsModule({ rolePermissions, onPermissionsChange }:
     const targetStatus = staff.status === "blocked" ? "active" : "blocked";
     const updated = simActions.updateStaff(staff.id, { status: targetStatus });
     if (updated) {
-      setStaffList(simActions.getStaff());
+      setStaffList(simActions.getStaff().filter(s => s.role !== "technician"));
       addAuditLogEntry("staff", "UPDATE", `${targetStatus === "blocked" ? "Khóa" : "Kích hoạt lại"} tài khoản nhân sự ${staff.name}`);
       showToast(`Đã cập nhật trạng thái tài khoản cho ${staff.name}`);
     }
+  };
+
+  // Delete staff member - request
+  const handleRequestDeleteStaff = (staff: any) => {
+    setStaffToDelete(staff);
+    setDeleteConfirmInput("");
+    setShowDeleteConfirmModal(true);
+  };
+
+  // Delete staff member - confirm
+  const handleConfirmDeleteStaff = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!staffToDelete) return;
+    if (deleteConfirmInput.trim() !== staffToDelete.name) {
+      showToast("Xác nhận không khớp! Vui lòng nhập chính xác tên nhân sự.");
+      return;
+    }
+
+    const success = simActions.deleteStaff(staffToDelete.id);
+    if (success) {
+      setStaffList(simActions.getStaff().filter(s => s.role !== "technician"));
+      addAuditLogEntry("staff", "DELETE", `Xóa vĩnh viễn tài khoản nhân sự: ${staffToDelete.name}`);
+      showToast(`Đã xóa tài khoản ${staffToDelete.name} thành công!`);
+      setShowDeleteConfirmModal(false);
+      setStaffToDelete(null);
+      setDeleteConfirmInput("");
+    } else {
+      showToast("Có lỗi xảy ra khi xóa nhân sự.");
+    }
+  };
+
+  // Create User Role
+  const handleCreateRole = (e: React.FormEvent) => {
+    e.preventDefault();
+    const keyClean = newRoleKey.trim().toLowerCase().replace(/[^a-z0-9_]/g, "");
+    const nameClean = newRoleName.trim();
+    if (!keyClean || !nameClean) {
+      showToast("Vui lòng nhập đầy đủ mã và tên vai trò!");
+      return;
+    }
+
+    if (userRoles.some(r => r.key === keyClean)) {
+      showToast("Mã vai trò này đã tồn tại!");
+      return;
+    }
+
+    const newRole: UserRole = {
+      key: keyClean,
+      name: nameClean
+    };
+
+    setUserRoles(prev => [...prev, newRole]);
+
+    // Initialize matrix permissions for the new role
+    setMatrixPermissions(prev => ({
+      ...prev,
+      [keyClean]: {
+        settings: [],
+        dashboard: [],
+        reception: [],
+        ktv: [],
+        pos: [],
+        crm: [],
+        finance: [],
+        services: [],
+        inventory: [],
+        monitor: [],
+        staff: [],
+        hr: []
+      }
+    }));
+
+    setSelectedRoleForMatrix(keyClean);
+    setShowAddRoleModal(false);
+    setNewRoleKey("");
+    setNewRoleName("");
+
+    addAuditLogEntry("staff", "CREATE", `Tạo vai trò người dùng mới: ${nameClean} (${keyClean})`);
+    showToast(`Đã tạo vai trò "${nameClean}" thành công!`);
+  };
+
+  // Delete User Role - Request
+  const handleRequestDeleteRole = (roleKey: string) => {
+    const roleObj = userRoles.find(r => r.key === roleKey);
+    if (!roleObj) return;
+    if (roleObj.isSystem) {
+      showToast("Không thể xóa vai trò hệ thống!");
+      return;
+    }
+    setRoleToDelete(roleObj);
+    setDeleteRoleConfirmInput("");
+    setShowDeleteRoleModal(true);
+  };
+
+  // Delete User Role - Confirm
+  const handleConfirmDeleteRole = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!roleToDelete) return;
+    if (deleteRoleConfirmInput.trim() !== roleToDelete.name) {
+      showToast("Xác nhận không khớp! Vui lòng nhập chính xác tên vai trò.");
+      return;
+    }
+
+    const roleKey = roleToDelete.key;
+
+    // 1. Update userRoles
+    setUserRoles(prev => prev.filter(r => r.key !== roleKey));
+    
+    // 2. Remove from matrixPermissions
+    setMatrixPermissions(prev => {
+      const copy = { ...prev };
+      delete copy[roleKey];
+      return copy;
+    });
+
+    // 3. Update staff who have this role to 'manager'
+    const affectedStaff = simActions.getStaff().filter(s => s.role === roleKey);
+    affectedStaff.forEach(s => {
+      simActions.updateStaff(s.id, { role: "manager" });
+    });
+    setStaffList(simActions.getStaff().filter(s => s.role !== "technician"));
+
+    if (selectedRoleForMatrix === roleKey) {
+      setSelectedRoleForMatrix("manager");
+    }
+
+    addAuditLogEntry("staff", "DELETE", `Xóa vai trò người dùng: ${roleToDelete.name}`);
+    showToast(`Đã xóa vai trò "${roleToDelete.name}" thành công!`);
+
+    setShowDeleteRoleModal(false);
+    setRoleToDelete(null);
+    setDeleteRoleConfirmInput("");
   };
 
   // Save Control Tower (Surcharges, limits, thresholds, stock alert)
@@ -623,7 +818,7 @@ export default function SettingsModule({ rolePermissions, onPermissionsChange }:
                 required
                 value={stationId}
                 onChange={(e) => setStationId(e.target.value.toUpperCase())}
-                className="w-full bg-gray-50 border border-[#e5e5e5] rounded-xl px-3.5 py-2.5 font-mono font-bold text-matte-black focus:outline-none focus:border-forest-green"
+                className="w-full bg-gray-50 border border-[#e5e5e5] rounded-xl px-3.5 py-2.5 font-sans font-bold text-matte-black focus:outline-none focus:border-forest-green"
               />
             </div>
             <div className="space-y-1.5 md:col-span-2">
@@ -694,7 +889,7 @@ export default function SettingsModule({ rolePermissions, onPermissionsChange }:
                   required
                   value={openTime}
                   onChange={(e) => setOpenTime(e.target.value)}
-                  className="w-full bg-white border border-[#e5e5e5] rounded-xl px-4 py-2.5 font-mono font-bold text-matte-black focus:outline-none focus:border-forest-green"
+                  className="w-full bg-white border border-[#e5e5e5] rounded-xl px-4 py-2.5 font-sans font-bold text-matte-black focus:outline-none focus:border-forest-green"
                 />
               </div>
               <div className="space-y-1.5">
@@ -704,7 +899,7 @@ export default function SettingsModule({ rolePermissions, onPermissionsChange }:
                   required
                   value={closeTime}
                   onChange={(e) => setCloseTime(e.target.value)}
-                  className="w-full bg-white border border-[#e5e5e5] rounded-xl px-4 py-2.5 font-mono font-bold text-matte-black focus:outline-none focus:border-forest-green"
+                  className="w-full bg-white border border-[#e5e5e5] rounded-xl px-4 py-2.5 font-sans font-bold text-matte-black focus:outline-none focus:border-forest-green"
                 />
               </div>
             </div>
@@ -744,20 +939,31 @@ export default function SettingsModule({ rolePermissions, onPermissionsChange }:
             <div className="space-y-3.5 max-h-[500px] overflow-y-auto pr-1">
               {staffList.map((st) => {
                 const tgId = localStorage.getItem(`wassup_staff_tg_${st.id}`);
+                
+                // Dynamic role styling helper
+                const getRoleBadgeClass = (roleKey: string) => {
+                  if (roleKey === "master_admin") return "bg-purple-100 text-purple-800";
+                  if (roleKey === "manager") return "bg-blue-100 text-blue-800";
+                  if (roleKey === "technician") return "bg-green-100 text-green-800";
+                  if (roleKey === "accountant") return "bg-amber-100 text-amber-800";
+                  return "bg-slate-100 text-slate-800 border border-slate-200/55";
+                };
+
+                const getRoleDisplayName = (roleKey: string) => {
+                  const roleObj = userRoles.find(r => r.key === roleKey);
+                  return roleObj ? roleObj.name : roleKey;
+                };
+
                 return (
                   <div key={st.id} className="p-3 bg-gray-50/50 border border-gray-200/60 rounded-xl flex items-center justify-between gap-3 hover:border-gray-300 transition-all">
                     <div className="space-y-1 min-w-0 flex-1">
                       <div className="flex items-center gap-2">
                         <span className="font-extrabold text-xs text-matte-black truncate">{st.name}</span>
-                        <span className={`text-[8px] font-black uppercase px-1.5 py-0.5 rounded ${
-                          st.role === "master_admin" ? "bg-purple-100 text-purple-800" :
-                          st.role === "manager" ? "bg-blue-100 text-blue-800" :
-                          st.role === "technician" ? "bg-green-100 text-green-800" : "bg-amber-100 text-amber-800"
-                        }`}>
-                          {st.role === "master_admin" ? "Admin" : st.role === "manager" ? "Quản lý" : st.role === "technician" ? "KTV" : "Kế toán"}
+                        <span className={`text-[8px] font-black uppercase px-1.5 py-0.5 rounded ${getRoleBadgeClass(st.role)}`}>
+                          {getRoleDisplayName(st.role)}
                         </span>
                       </div>
-                      <div className="flex items-center gap-3 text-[10px] text-mid-gray font-mono">
+                      <div className="flex items-center gap-3 text-[10px] text-mid-gray font-sans">
                         <span>☎️ {st.phone}</span>
                         <span>🔑 PIN: {st.pin || "123456"}</span>
                       </div>
@@ -789,6 +995,13 @@ export default function SettingsModule({ rolePermissions, onPermissionsChange }:
                       >
                         {st.status === "blocked" ? "Locked" : "Active"}
                       </button>
+                      <button
+                        onClick={() => handleRequestDeleteStaff(st)}
+                        className="p-1.5 text-mid-gray hover:text-red-600 rounded-lg hover:bg-red-50 transition"
+                        title="Xóa vĩnh viễn"
+                      >
+                        <Trash2 className="h-3.5 w-3.5" />
+                      </button>
                     </div>
                   </div>
                 );
@@ -808,19 +1021,41 @@ export default function SettingsModule({ rolePermissions, onPermissionsChange }:
               </div>
 
               {/* Matrix Role Selector */}
-              <div className="flex bg-gray-100 p-0.5 rounded-lg border border-gray-200 text-[10px] font-bold">
-                {["manager", "technician", "accountant"].map((role) => (
-                  <button
-                    key={role}
-                    type="button"
-                    onClick={() => setSelectedRoleForMatrix(role as any)}
-                    className={`px-2.5 py-1 rounded-md transition capitalize cursor-pointer ${
-                      selectedRoleForMatrix === role ? "bg-white text-matte-black shadow-3xs font-black" : "text-mid-gray"
-                    }`}
-                  >
-                    {role === "manager" ? "Quản lý" : role === "technician" ? "KTV" : "Kế toán"}
-                  </button>
-                ))}
+              <div className="flex flex-wrap items-center gap-2">
+                <div className="flex bg-gray-100 p-0.5 rounded-lg border border-gray-200 text-[10px] font-bold overflow-x-auto max-w-[420px]">
+                  {userRoles.map((role) => (
+                    <div
+                      key={role.key}
+                      onClick={() => setSelectedRoleForMatrix(role.key)}
+                      className={`flex items-center gap-1.5 px-2.5 py-1 rounded-md transition cursor-pointer whitespace-nowrap ${
+                        selectedRoleForMatrix === role.key ? "bg-white text-matte-black shadow-3xs font-black" : "text-mid-gray hover:text-matte-black"
+                      }`}
+                    >
+                      <span>{role.name}</span>
+                      {!role.isSystem && (
+                        <button
+                          type="button"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleRequestDeleteRole(role.key);
+                          }}
+                          className="p-0.5 rounded hover:bg-red-50 hover:text-red-600 transition"
+                          title="Xóa vai trò"
+                        >
+                          <X className="h-2.5 w-2.5" />
+                        </button>
+                      )}
+                    </div>
+                  ))}
+                </div>
+
+                <button
+                  type="button"
+                  onClick={() => setShowAddRoleModal(true)}
+                  className="px-2.5 py-1.5 rounded-lg border border-purple-200 hover:bg-purple-50 text-purple-700 transition flex items-center gap-1 text-[10px] font-black uppercase cursor-pointer"
+                >
+                  <Plus className="h-3 w-3" /> Tạo Role
+                </button>
               </div>
             </div>
 
@@ -916,7 +1151,7 @@ export default function SettingsModule({ rolePermissions, onPermissionsChange }:
                     type="number"
                     value={dailyTarget}
                     onChange={(e) => setDailyTarget(Number(e.target.value))}
-                    className="w-full bg-white border border-gray-200 rounded-lg px-3 py-2 font-mono font-bold text-forest-green"
+                    className="w-full bg-white border border-gray-200 rounded-lg px-3 py-2 font-sans font-bold text-forest-green"
                   />
                 </div>
                 <div className="space-y-1">
@@ -925,7 +1160,7 @@ export default function SettingsModule({ rolePermissions, onPermissionsChange }:
                     type="number"
                     value={warningLevel}
                     onChange={(e) => setWarningLevel(Number(e.target.value))}
-                    className="w-full bg-white border border-gray-200 rounded-lg px-3 py-2 font-mono font-bold text-amber-600"
+                    className="w-full bg-white border border-gray-200 rounded-lg px-3 py-2 font-sans font-bold text-amber-600"
                   />
                 </div>
                 <div className="space-y-1">
@@ -934,7 +1169,7 @@ export default function SettingsModule({ rolePermissions, onPermissionsChange }:
                     type="number"
                     value={redThreshold}
                     onChange={(e) => setRedThreshold(Number(e.target.value))}
-                    className="w-full bg-white border border-gray-200 rounded-lg px-3 py-2 font-mono font-bold text-red-600"
+                    className="w-full bg-white border border-gray-200 rounded-lg px-3 py-2 font-sans font-bold text-red-600"
                   />
                 </div>
               </div>
@@ -956,7 +1191,7 @@ export default function SettingsModule({ rolePermissions, onPermissionsChange }:
                       type="number"
                       value={surcharges.sedan}
                       onChange={(e) => setSurcharges({ ...surcharges, sedan: Number(e.target.value) })}
-                      className="w-24 bg-white border border-gray-200 rounded-lg px-2.5 py-1 font-mono font-bold text-right"
+                      className="w-24 bg-white border border-gray-200 rounded-lg px-2.5 py-1 font-sans font-bold text-right"
                     />
                   </div>
                   <div className="flex items-center justify-between gap-2">
@@ -965,7 +1200,7 @@ export default function SettingsModule({ rolePermissions, onPermissionsChange }:
                       type="number"
                       value={surcharges.suv}
                       onChange={(e) => setSurcharges({ ...surcharges, suv: Number(e.target.value) })}
-                      className="w-24 bg-white border border-gray-200 rounded-lg px-2.5 py-1 font-mono font-bold text-right"
+                      className="w-24 bg-white border border-gray-200 rounded-lg px-2.5 py-1 font-sans font-bold text-right"
                     />
                   </div>
                   <div className="flex items-center justify-between gap-2">
@@ -974,7 +1209,7 @@ export default function SettingsModule({ rolePermissions, onPermissionsChange }:
                       type="number"
                       value={surcharges.luxury}
                       onChange={(e) => setSurcharges({ ...surcharges, luxury: Number(e.target.value) })}
-                      className="w-24 bg-white border border-gray-200 rounded-lg px-2.5 py-1 font-mono font-bold text-right"
+                      className="w-24 bg-white border border-gray-200 rounded-lg px-2.5 py-1 font-sans font-bold text-right"
                     />
                   </div>
                   <div className="flex items-center justify-between gap-2">
@@ -983,7 +1218,7 @@ export default function SettingsModule({ rolePermissions, onPermissionsChange }:
                       type="number"
                       value={surcharges.electric}
                       onChange={(e) => setSurcharges({ ...surcharges, electric: Number(e.target.value) })}
-                      className="w-24 bg-white border border-gray-200 rounded-lg px-2.5 py-1 font-mono font-bold text-right"
+                      className="w-24 bg-white border border-gray-200 rounded-lg px-2.5 py-1 font-sans font-bold text-right"
                     />
                   </div>
                 </div>
@@ -1003,7 +1238,7 @@ export default function SettingsModule({ rolePermissions, onPermissionsChange }:
                       type="number"
                       value={spendingLimits.manager}
                       onChange={(e) => setSpendingLimits({ ...spendingLimits, manager: Number(e.target.value) })}
-                      className="w-28 bg-white border border-gray-200 rounded-lg px-2.5 py-1 font-mono font-bold text-right"
+                      className="w-28 bg-white border border-gray-200 rounded-lg px-2.5 py-1 font-sans font-bold text-right"
                     />
                   </div>
                   <div className="flex items-center justify-between gap-2">
@@ -1012,7 +1247,7 @@ export default function SettingsModule({ rolePermissions, onPermissionsChange }:
                       type="number"
                       value={spendingLimits.accountant}
                       onChange={(e) => setSpendingLimits({ ...spendingLimits, accountant: Number(e.target.value) })}
-                      className="w-28 bg-white border border-gray-200 rounded-lg px-2.5 py-1 font-mono font-bold text-right"
+                      className="w-28 bg-white border border-gray-200 rounded-lg px-2.5 py-1 font-sans font-bold text-right"
                     />
                   </div>
                   <div className="flex items-center justify-between gap-2">
@@ -1021,7 +1256,7 @@ export default function SettingsModule({ rolePermissions, onPermissionsChange }:
                       type="number"
                       value={spendingLimits.technician}
                       onChange={(e) => setSpendingLimits({ ...spendingLimits, technician: Number(e.target.value) })}
-                      className="w-28 bg-white border border-gray-200 rounded-lg px-2.5 py-1 font-mono font-bold text-right"
+                      className="w-28 bg-white border border-gray-200 rounded-lg px-2.5 py-1 font-sans font-bold text-right"
                     />
                   </div>
                 </div>
@@ -1049,7 +1284,7 @@ export default function SettingsModule({ rolePermissions, onPermissionsChange }:
                   type="number"
                   value={lowStockWarning}
                   onChange={(e) => setLowStockWarning(Number(e.target.value))}
-                  className="w-20 bg-white border border-amber-200 rounded-lg px-3 py-1.5 font-mono font-bold text-center text-amber-800 focus:outline-none focus:border-amber-500"
+                  className="w-20 bg-white border border-amber-200 rounded-lg px-3 py-1.5 font-sans font-bold text-center text-amber-800 focus:outline-none focus:border-amber-500"
                 />
                 <span className="font-bold text-amber-700">đơn vị</span>
               </div>
@@ -1082,7 +1317,7 @@ export default function SettingsModule({ rolePermissions, onPermissionsChange }:
                 <p className="text-[11px] text-mid-gray font-sans mt-0.5">Tích hợp phần cứng sảnh chờ, máy in nhiệt POS Kiosk và đồng bộ hóa Telegram Bot KTV.</p>
               </div>
 
-              <span className="text-[10px] bg-emerald-50 text-emerald-800 font-mono font-bold border border-emerald-100 px-3 py-1 rounded-full uppercase tracking-wider flex items-center gap-1">
+              <span className="text-[10px] bg-emerald-50 text-emerald-800 font-sans font-bold border border-emerald-100 px-3 py-1 rounded-full uppercase tracking-wider flex items-center gap-1">
                 <span className="h-1.5 w-1.5 bg-emerald-500 rounded-full animate-ping" />
                 Active integrations
               </span>
@@ -1090,44 +1325,21 @@ export default function SettingsModule({ rolePermissions, onPermissionsChange }:
 
             {/* Split grid for different peripherals */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 text-xs">
-              {/* Telegram bot config */}
-              <div className="space-y-4 bg-gray-50/50 p-4 rounded-xl border border-gray-150">
-                <span className="font-extrabold text-matte-black uppercase tracking-wider block border-b border-gray-200 pb-2 flex items-center gap-1.5">
-                  <Send className="h-4 w-4 text-blue-500" />
-                  Cấu hình Telegram Notification Webhook
+              {/* Telegram bot config - Moved to Module 8 */}
+              <div className="space-y-4 bg-blue-50/20 p-5 rounded-xl border border-blue-200/40">
+                <span className="font-extrabold text-blue-900 uppercase tracking-wider block border-b border-blue-100 pb-2 flex items-center gap-1.5">
+                  <Send className="h-4 w-4 text-blue-500 animate-pulse" />
+                  Cấu hình Telegram & Zalo Bot Nhận Việc
                 </span>
-                
-                <div className="space-y-3">
-                  <div className="space-y-1">
-                    <label className="font-bold text-mid-gray">Telegram Bot Token</label>
-                    <input
-                      type="text"
-                      required
-                      value={telegramToken}
-                      onChange={(e) => setTelegramToken(e.target.value)}
-                      className="w-full bg-white border border-gray-200 rounded-lg px-3 py-2 font-mono text-slate-700"
-                    />
-                  </div>
-                  <div className="space-y-1">
-                    <label className="font-bold text-mid-gray">Mã Chat ID Nhóm Báo Động</label>
-                    <input
-                      type="text"
-                      required
-                      value={telegramGroupChatId}
-                      onChange={(e) => setTelegramGroupChatId(e.target.value)}
-                      className="w-full bg-white border border-gray-200 rounded-lg px-3 py-2 font-mono text-slate-700"
-                    />
-                  </div>
-                  <div className="pt-2 flex justify-between items-center">
-                    <span className="text-[10px] text-mid-gray font-sans">Đồng bộ trạng thái lệnh Realtime với KTV Bot</span>
-                    <button
-                      type="button"
-                      onClick={handleTestTelegramConnection}
-                      className="px-3 py-1.5 bg-blue-50 text-blue-600 hover:bg-blue-100 border border-blue-200 font-black uppercase text-[9px] rounded-lg tracking-wider"
-                    >
-                      Kiểm tra kết nối
-                    </button>
-                  </div>
+                <p className="text-xs text-blue-700 font-sans leading-relaxed">
+                  Thiết lập tích hợp <strong>Telegram Bot và Zalo Bot</strong> đã được di chuyển sang 
+                  <strong> Module 8: Carer Performance (Quản lý KTV)</strong>.
+                </p>
+                <p className="text-xs text-slate-500 font-sans leading-relaxed">
+                  Vì kỹ thuật viên trạm nhận lệnh, báo cáo hao phí và phản hồi kết quả thi công hoàn toàn thông qua Zalo / Telegram Bot mà không cần login trực tiếp vào hệ thống Station OS, việc quản lý kênh liên lạc được gom về Module 8 để đảm bảo đồng nhất dữ liệu.
+                </p>
+                <div className="pt-2 text-[11px] font-bold text-blue-800">
+                  ⚠️ Hãy chuyển sang Module 8, chọn tab "Cấu hình Bot & Kênh" để thay đổi Token hoặc Chat ID.
                 </div>
               </div>
 
@@ -1146,7 +1358,7 @@ export default function SettingsModule({ rolePermissions, onPermissionsChange }:
                       required
                       value={kioskTerminalIp}
                       onChange={(e) => setKioskTerminalIp(e.target.value)}
-                      className="w-full bg-white border border-gray-200 rounded-lg px-3 py-2 font-mono text-center"
+                      className="w-full bg-white border border-gray-200 rounded-lg px-3 py-2 font-sans text-center"
                     />
                   </div>
                   <div className="space-y-1">
@@ -1156,7 +1368,7 @@ export default function SettingsModule({ rolePermissions, onPermissionsChange }:
                       required
                       value={kioskPort}
                       onChange={(e) => setKioskPort(e.target.value)}
-                      className="w-full bg-white border border-gray-200 rounded-lg px-3 py-2 font-mono text-center"
+                      className="w-full bg-white border border-gray-200 rounded-lg px-3 py-2 font-sans text-center"
                     />
                   </div>
                 </div>
@@ -1167,7 +1379,7 @@ export default function SettingsModule({ rolePermissions, onPermissionsChange }:
                     required
                     value={kioskSecret}
                     onChange={(e) => setKioskSecret(e.target.value)}
-                    className="w-full bg-white border border-gray-200 rounded-lg px-3 py-2 font-mono"
+                    className="w-full bg-white border border-gray-200 rounded-lg px-3 py-2 font-sans"
                   />
                 </div>
               </div>
@@ -1389,18 +1601,26 @@ export default function SettingsModule({ rolePermissions, onPermissionsChange }:
                         </td>
                         <td className="p-3">
                           <span className="px-2 py-0.5 rounded-full bg-slate-100 text-slate-700 text-[9px] font-sans font-bold uppercase">
-                            {log.module}
+                            {log.module || "staff"}
                           </span>
                         </td>
                         <td className="p-3">
-                          <span className={`px-2 py-0.5 rounded font-black text-[9px] uppercase tracking-wider ${
-                            log.type === "CREATE" ? "bg-emerald-50 text-emerald-800 border border-emerald-200" :
-                            log.type === "UPDATE" ? "bg-amber-50 text-amber-800 border border-amber-200" :
-                            log.type === "DELETE" ? "bg-red-50 text-red-800 border border-red-200 animate-pulse" :
-                            "bg-blue-50 text-blue-800 border border-blue-200"
-                          }`}>
-                            {log.type}
-                          </span>
+                          {(() => {
+                            const actType = log.type || log.action || "SYSTEM";
+                            const isCreate = actType === "CREATE" || actType.startsWith("CREATE");
+                            const isUpdate = actType === "UPDATE" || actType.startsWith("UPDATE");
+                            const isDelete = actType === "DELETE" || actType.startsWith("BLOCK") || actType.startsWith("DELETE");
+                            return (
+                              <span className={`px-2 py-0.5 rounded font-black text-[9px] uppercase tracking-wider ${
+                                isCreate ? "bg-emerald-50 text-emerald-800 border border-emerald-200" :
+                                isUpdate ? "bg-amber-50 text-amber-800 border border-amber-200" :
+                                isDelete ? "bg-red-50 text-red-800 border border-red-200 animate-pulse" :
+                                "bg-blue-50 text-blue-800 border border-blue-200"
+                              }`}>
+                                {actType}
+                              </span>
+                            );
+                          })()}
                         </td>
                         <td className="p-3 font-medium text-matte-black leading-relaxed">
                           {log.details}
@@ -1466,10 +1686,9 @@ export default function SettingsModule({ rolePermissions, onPermissionsChange }:
                     onChange={(e) => setStaffForm({ ...staffForm, role: e.target.value as any })}
                     className="w-full bg-white border border-[#e5e5e5] rounded-xl px-3 py-2.5 text-xs text-matte-black focus:outline-none focus:border-purple-500"
                   >
-                    <option value="technician">Kỹ thuật viên</option>
-                    <option value="manager">Quản lý trạm</option>
-                    <option value="accountant">Kế toán</option>
-                    <option value="master_admin">Master Admin</option>
+                    {userRoles.filter(r => r.key !== "technician").map(r => (
+                      <option key={r.key} value={r.key}>{r.name}</option>
+                    ))}
                   </select>
                 </div>
 
@@ -1485,20 +1704,6 @@ export default function SettingsModule({ rolePermissions, onPermissionsChange }:
                     className="w-full bg-white border border-[#e5e5e5] rounded-xl px-3 py-2.5 text-xs font-sans font-bold tracking-widest text-center text-matte-black focus:outline-none focus:border-purple-500"
                   />
                 </div>
-              </div>
-
-              <div className="space-y-1.5">
-                <label className="font-extrabold text-mid-gray uppercase block flex justify-between">
-                  <span>Mã Chat ID Telegram (Nếu có)</span>
-                  <span className="text-[9px] text-purple-600 font-semibold normal-case">Để đồng bộ Telegram Bot KTV</span>
-                </label>
-                <input
-                  type="text"
-                  placeholder="Ví dụ: 582910482"
-                  value={staffForm.telegramChatId}
-                  onChange={(e) => setStaffForm({ ...staffForm, telegramChatId: e.target.value })}
-                  className="w-full bg-white border border-[#e5e5e5] rounded-xl px-3 py-2.5 text-xs font-sans text-matte-black focus:outline-none focus:border-purple-500"
-                />
               </div>
 
               <div className="pt-4 flex gap-3">
@@ -1570,10 +1775,9 @@ export default function SettingsModule({ rolePermissions, onPermissionsChange }:
                     onChange={(e) => setStaffForm({ ...staffForm, role: e.target.value as any })}
                     className="w-full bg-white border border-[#e5e5e5] rounded-xl px-3 py-2.5 text-xs text-matte-black focus:outline-none focus:border-purple-500"
                   >
-                    <option value="technician">Kỹ thuật viên</option>
-                    <option value="manager">Quản lý trạm</option>
-                    <option value="accountant">Kế toán</option>
-                    <option value="master_admin">Master Admin</option>
+                    {userRoles.filter(r => r.key !== "technician").map(r => (
+                      <option key={r.key} value={r.key}>{r.name}</option>
+                    ))}
                   </select>
                 </div>
 
@@ -1588,20 +1792,6 @@ export default function SettingsModule({ rolePermissions, onPermissionsChange }:
                     className="w-full bg-white border border-[#e5e5e5] rounded-xl px-3 py-2.5 text-xs font-sans font-bold tracking-widest text-center text-matte-black focus:outline-none focus:border-purple-500"
                   />
                 </div>
-              </div>
-
-              <div className="space-y-1.5">
-                <label className="font-extrabold text-mid-gray uppercase block flex justify-between">
-                  <span>Mã Chat ID Telegram (Nếu có)</span>
-                  <span className="text-[9px] text-purple-600 font-semibold normal-case">Đồng bộ Telegram Bot KTV</span>
-                </label>
-                <input
-                  type="text"
-                  placeholder="Chưa cấu hình Chat ID"
-                  value={staffForm.telegramChatId}
-                  onChange={(e) => setStaffForm({ ...staffForm, telegramChatId: e.target.value })}
-                  className="w-full bg-white border border-[#e5e5e5] rounded-xl px-3 py-2.5 text-xs font-sans text-matte-black focus:outline-none focus:border-purple-500"
-                />
               </div>
 
               <div className="pt-4 flex gap-3">
@@ -1620,6 +1810,208 @@ export default function SettingsModule({ rolePermissions, onPermissionsChange }:
                   className="flex-1 py-2.5 rounded-xl bg-purple-600 hover:bg-purple-700 text-white font-extrabold text-xs uppercase transition shadow-sm"
                 >
                   Lưu thay đổi
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* Dynamic Role Creation Modal */}
+      {showAddRoleModal && (
+        <div className="fixed inset-0 bg-matte-black/50 backdrop-blur-xs flex items-center justify-center z-50 p-4 animate-fadeIn">
+          <div className="bg-white border border-[#e5e5e5] w-full max-w-sm rounded-2xl p-6 shadow-2xl relative">
+            <button
+              onClick={() => setShowAddRoleModal(false)}
+              className="absolute top-4 right-4 text-mid-gray hover:text-matte-black transition"
+            >
+              <X className="h-5 w-5" />
+            </button>
+
+            <h3 className="text-sm font-black font-display tracking-wider text-matte-black uppercase mb-4 flex items-center gap-2 border-b border-[#e5e5e5] pb-3">
+              <ShieldCheck className="h-5 w-5 text-purple-600" />
+              TẠO VAI TRÒ NGƯỜI DÙNG MỚI
+            </h3>
+
+            <form onSubmit={handleCreateRole} className="space-y-4 text-xs font-sans">
+              <div className="space-y-1.5">
+                <label className="font-extrabold text-mid-gray uppercase">Mã vai trò (Role Key)</label>
+                <input
+                  type="text"
+                  required
+                  placeholder="Ví dụ: receptionist, supervisor"
+                  value={newRoleKey}
+                  onChange={(e) => setNewRoleKey(e.target.value)}
+                  className="w-full bg-white border border-[#e5e5e5] rounded-xl px-3 py-2.5 text-xs text-matte-black focus:outline-none focus:border-purple-500 font-mono"
+                />
+                <span className="text-[10px] text-mid-gray block">Chỉ gồm các chữ cái viết thường và dấu gạch dưới (a-z, 0-9, _).</span>
+              </div>
+
+              <div className="space-y-1.5">
+                <label className="font-extrabold text-mid-gray uppercase">Tên hiển thị vai trò (Role Name)</label>
+                <input
+                  type="text"
+                  required
+                  placeholder="Ví dụ: Lễ tân đón khách"
+                  value={newRoleName}
+                  onChange={(e) => setNewRoleName(e.target.value)}
+                  className="w-full bg-white border border-[#e5e5e5] rounded-xl px-3 py-2.5 text-xs text-matte-black focus:outline-none focus:border-purple-500"
+                />
+              </div>
+
+              <div className="pt-4 flex gap-3">
+                <button
+                  type="button"
+                  onClick={() => setShowAddRoleModal(false)}
+                  className="flex-1 py-2.5 rounded-xl border border-gray-300 text-mid-gray hover:bg-gray-50 text-xs font-extrabold uppercase transition"
+                >
+                  Hủy bỏ
+                </button>
+                <button
+                  type="submit"
+                  className="flex-1 py-2.5 rounded-xl bg-purple-600 hover:bg-purple-700 text-white font-extrabold text-xs uppercase transition shadow-sm"
+                >
+                  Tạo vai trò
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* User Deletion Confirmation Modal */}
+      {showDeleteConfirmModal && staffToDelete && (
+        <div className="fixed inset-0 bg-matte-black/50 backdrop-blur-xs flex items-center justify-center z-50 p-4 animate-fadeIn">
+          <div className="bg-white border border-[#e5e5e5] w-full max-w-sm rounded-2xl p-6 shadow-2xl relative">
+            <button
+              onClick={() => {
+                setShowDeleteConfirmModal(false);
+                setStaffToDelete(null);
+                setDeleteConfirmInput("");
+              }}
+              className="absolute top-4 right-4 text-mid-gray hover:text-matte-black transition"
+            >
+              <X className="h-5 w-5" />
+            </button>
+
+            <h3 className="text-sm font-black font-display tracking-wider text-red-600 uppercase mb-4 flex items-center gap-2 border-b border-[#e5e5e5] pb-3">
+              <AlertTriangle className="h-5 w-5 text-red-600 animate-bounce" />
+              XÁC NHẬN XÓA TÀI KHOẢN
+            </h3>
+
+            <form onSubmit={handleConfirmDeleteStaff} className="space-y-4 text-xs font-sans">
+              <div className="bg-red-50 border border-red-200 p-3 rounded-xl text-red-900 leading-relaxed text-[11px]">
+                <p className="font-extrabold mb-1">⚠️ Cảnh báo cực kỳ quan trọng:</p>
+                Hành động này sẽ xóa vĩnh viễn tài khoản của <strong>{staffToDelete.name}</strong> ra khỏi danh sách hệ thống. Mọi phân quyền liên quan sẽ bị thu hồi ngay lập tức và không thể khôi phục.
+              </div>
+
+              <div className="space-y-1.5">
+                <label className="font-extrabold text-mid-gray uppercase block">
+                  Để xác nhận, vui lòng nhập chính xác họ tên 
+                  <span className="text-red-600 font-black block mt-0.5 select-all">{staffToDelete.name}</span>
+                </label>
+                <input
+                  type="text"
+                  required
+                  placeholder="Nhập đúng tên nhân sự để xác thực"
+                  value={deleteConfirmInput}
+                  onChange={(e) => setDeleteConfirmInput(e.target.value)}
+                  className="w-full bg-white border border-[#e5e5e5] rounded-xl px-3 py-2.5 text-xs text-matte-black focus:outline-none focus:border-red-500 font-bold"
+                />
+              </div>
+
+              <div className="pt-4 flex gap-3">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setShowDeleteConfirmModal(false);
+                    setStaffToDelete(null);
+                    setDeleteConfirmInput("");
+                  }}
+                  className="flex-1 py-2.5 rounded-xl border border-gray-300 text-mid-gray hover:bg-gray-50 text-xs font-extrabold uppercase transition"
+                >
+                  Hủy bỏ
+                </button>
+                <button
+                  type="submit"
+                  disabled={deleteConfirmInput.trim() !== staffToDelete.name}
+                  className={`flex-1 py-2.5 rounded-xl font-extrabold text-xs uppercase transition shadow-sm text-white ${
+                    deleteConfirmInput.trim() === staffToDelete.name
+                      ? "bg-red-600 hover:bg-red-700 cursor-pointer"
+                      : "bg-gray-300 cursor-not-allowed"
+                  }`}
+                >
+                  Xóa vĩnh viễn
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* Role Deletion Confirmation Modal */}
+      {showDeleteRoleModal && roleToDelete && (
+        <div className="fixed inset-0 bg-matte-black/50 backdrop-blur-xs flex items-center justify-center z-50 p-4 animate-fadeIn">
+          <div className="bg-white border border-[#e5e5e5] w-full max-w-sm rounded-2xl p-6 shadow-2xl relative">
+            <button
+              onClick={() => {
+                setShowDeleteRoleModal(false);
+                setRoleToDelete(null);
+                setDeleteRoleConfirmInput("");
+              }}
+              className="absolute top-4 right-4 text-mid-gray hover:text-matte-black transition"
+            >
+              <X className="h-5 w-5" />
+            </button>
+
+            <h3 className="text-sm font-black font-display tracking-wider text-red-600 uppercase mb-4 flex items-center gap-2 border-b border-[#e5e5e5] pb-3">
+              <AlertTriangle className="h-5 w-5 text-red-600 animate-bounce" />
+              XÁC NHẬN XÓA VAI TRÒ
+            </h3>
+
+            <form onSubmit={handleConfirmDeleteRole} className="space-y-4 text-xs font-sans">
+              <div className="bg-red-50 border border-red-200 p-3 rounded-xl text-red-900 leading-relaxed text-[11px]">
+                <p className="font-extrabold mb-1">⚠️ Cảnh báo cực kỳ quan trọng:</p>
+                Hành động này sẽ xóa vĩnh viễn vai trò <strong>{roleToDelete.name}</strong>. Tất cả nhân sự mang vai trò này sẽ tự động chuyển về vai trò <strong>Quản lý trạm (manager)</strong>. Mọi thiết lập phân quyền cụ thể cho vai trò này cũng sẽ bị xóa vĩnh viễn.
+              </div>
+
+              <div className="space-y-1.5">
+                <label className="font-extrabold text-mid-gray uppercase block">
+                  Để xác nhận, vui lòng nhập chính xác tên vai trò 
+                  <span className="text-red-600 font-black block mt-0.5 select-all">{roleToDelete.name}</span>
+                </label>
+                <input
+                  type="text"
+                  required
+                  placeholder="Nhập đúng tên vai trò để xác thực"
+                  value={deleteRoleConfirmInput}
+                  onChange={(e) => setDeleteRoleConfirmInput(e.target.value)}
+                  className="w-full bg-white border border-[#e5e5e5] rounded-xl px-3 py-2.5 text-xs text-matte-black focus:outline-none focus:border-red-500 font-bold"
+                />
+              </div>
+
+              <div className="pt-4 flex gap-3">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setShowDeleteRoleModal(false);
+                    setRoleToDelete(null);
+                    setDeleteRoleConfirmInput("");
+                  }}
+                  className="flex-1 py-2.5 rounded-xl border border-gray-300 text-mid-gray hover:bg-gray-50 text-xs font-extrabold uppercase transition"
+                >
+                  Hủy bỏ
+                </button>
+                <button
+                  type="submit"
+                  disabled={deleteRoleConfirmInput.trim() !== roleToDelete.name}
+                  className={`flex-1 py-2.5 rounded-xl font-extrabold text-xs uppercase transition shadow-sm text-white ${
+                    deleteRoleConfirmInput.trim() === roleToDelete.name
+                      ? "bg-red-600 hover:bg-red-700 cursor-pointer"
+                      : "bg-gray-300 cursor-not-allowed"
+                  }`}
+                >
+                  Xác nhận xóa
                 </button>
               </div>
             </form>

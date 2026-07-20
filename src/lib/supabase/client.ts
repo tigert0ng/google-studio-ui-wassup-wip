@@ -578,6 +578,29 @@ export const simActions = {
     return null;
   },
 
+  deleteStaff: (id: string) => {
+    const idx = currentState.staff.findIndex(s => s.id === id);
+    if (idx !== -1) {
+      currentState.staff.splice(idx, 1);
+      saveState();
+
+      if (isRealSupabase && supabase) {
+        (async () => {
+          try {
+            await supabase
+              .from("staff")
+              .delete()
+              .eq("id", id);
+          } catch (err) {
+            console.error("Error in Supabase deleteStaff:", err);
+          }
+        })();
+      }
+      return true;
+    }
+    return false;
+  },
+
   createOrder: (data: {
     customerPhone?: string;
     customerName?: string;

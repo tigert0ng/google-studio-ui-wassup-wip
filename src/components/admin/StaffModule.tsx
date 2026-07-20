@@ -44,15 +44,16 @@ interface AuditLog {
   id: string;
   timestamp: string;
   actor: string;
-  action: string;
-  targetName: string;
+  action?: string;
+  type?: string;
+  targetName?: string;
   details: string;
 }
 
 export default function StaffModule({ staff, orders }: StaffModuleProps) {
   // UI filter states
   const [searchQuery, setSearchQuery] = useState("");
-  const [activeTab, setActiveTab] = useState<"all" | "admin" | "ktv" | "accountant">("all");
+  const [activeTab, setActiveTab] = useState<"all" | "admin" | "accountant">("all");
   
   // Modals state
   const [showAddModal, setShowAddModal] = useState(false);
@@ -66,13 +67,13 @@ export default function StaffModule({ staff, orders }: StaffModuleProps) {
   const [addForm, setAddForm] = useState<NewStaffForm>({
     name: "",
     phone: "",
-    role: "technician",
+    role: "manager",
     pin: "123456"
   });
   const [editForm, setEditForm] = useState<NewStaffForm>({
     name: "",
     phone: "",
-    role: "technician",
+    role: "manager",
     pin: ""
   });
 
@@ -133,8 +134,10 @@ export default function StaffModule({ staff, orders }: StaffModuleProps) {
     localStorage.setItem("wassup_rbac_audit_logs", JSON.stringify(updated));
   };
 
-  // Filter staff based on search query and selected tab
+  // Filter staff based on search query and selected tab (exluding KTVs as they don't login to Station OS)
   const filteredStaff = staff.filter((s) => {
+    if (s.role === "technician") return false;
+    
     const matchesSearch =
       s.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
       s.phone.includes(searchQuery);
@@ -142,7 +145,6 @@ export default function StaffModule({ staff, orders }: StaffModuleProps) {
     if (!matchesSearch) return false;
 
     if (activeTab === "admin") return s.role === "master_admin" || s.role === "manager";
-    if (activeTab === "ktv") return s.role === "technician";
     if (activeTab === "accountant") return s.role === "accountant";
     return true;
   });
@@ -170,7 +172,7 @@ export default function StaffModule({ staff, orders }: StaffModuleProps) {
     showToast(`Đã thêm thành công nhân sự: ${newS.name}!`);
     
     // Reset form
-    setAddForm({ name: "", phone: "", role: "technician", pin: "123456" });
+    setAddForm({ name: "", phone: "", role: "manager", pin: "123456" });
     setShowAddModal(false);
   };
 
@@ -445,7 +447,7 @@ export default function StaffModule({ staff, orders }: StaffModuleProps) {
               activeTab === "all" ? "bg-matte-black text-white" : "text-mid-gray hover:text-matte-black"
             }`}
           >
-            Tất cả ({staff.length})
+            Tất cả ({staff.filter(s => s.role !== "technician").length})
           </button>
           <button
             onClick={() => setActiveTab("admin")}
@@ -454,14 +456,6 @@ export default function StaffModule({ staff, orders }: StaffModuleProps) {
             }`}
           >
             Quản trị ({staff.filter(s => s.role === "master_admin" || s.role === "manager").length})
-          </button>
-          <button
-            onClick={() => setActiveTab("ktv")}
-            className={`px-4 py-1.5 rounded-md font-bold transition ${
-              activeTab === "ktv" ? "bg-matte-black text-white" : "text-mid-gray hover:text-matte-black"
-            }`}
-          >
-            Kỹ thuật viên ({staff.filter(s => s.role === "technician").length})
           </button>
           <button
             onClick={() => setActiveTab("accountant")}
@@ -516,16 +510,16 @@ export default function StaffModule({ staff, orders }: StaffModuleProps) {
                           </div>
                           <div>
                             <p className="font-extrabold text-matte-black">{s.name}</p>
-                            <span className="text-[9px] text-mid-gray font-mono block uppercase">ID: {s.id}</span>
+                            <span className="text-[9px] text-mid-gray font-sans block uppercase">ID: {s.id}</span>
                           </div>
                         </div>
                       </td>
 
                       {/* Phone */}
-                      <td className="p-4 font-mono font-bold text-mid-gray text-sm">{s.phone}</td>
+                      <td className="p-4 font-sans font-bold text-mid-gray text-sm">{s.phone}</td>
 
                       {/* PIN Code */}
-                      <td className="p-4 font-mono font-bold text-purple-600 text-sm">
+                      <td className="p-4 font-sans font-bold text-purple-600 text-sm">
                         {s.pin || "123456"}
                       </td>
 
@@ -606,38 +600,45 @@ export default function StaffModule({ staff, orders }: StaffModuleProps) {
             <ShieldAlert className="h-4.5 w-4.5 text-purple-600" />
             SỔ NHẬT KÝ BẢO MẬT & KIỂM TOÁN (AUDIT TRAIL LOGS)
           </h3>
-          <span className="text-[10px] font-mono text-mid-gray uppercase font-semibold">
+          <span className="text-[10px] font-sans text-mid-gray uppercase font-semibold">
             Thời gian thực hành vi quản trị
           </span>
         </div>
 
         <div className="max-h-60 overflow-y-auto space-y-2.5 pr-2">
-          {auditLogs.map((log) => (
-            <div
-              key={log.id}
-              className="p-3 bg-warm-white/40 border border-[#e5e5e5] rounded-xl text-[11px] font-sans flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2"
-            >
-              <div className="space-y-1">
-                <div className="flex items-center flex-wrap gap-2">
-                  <span className={`px-1.5 py-0.5 rounded font-black text-[8px] uppercase ${
-                    log.action.startsWith("BLOCK") ? "bg-red-100 text-red-700" :
-                    log.action.startsWith("CREATE") ? "bg-blue-100 text-blue-700" :
-                    log.action.startsWith("UPDATE") ? "bg-amber-100 text-amber-700" :
-                    "bg-gray-100 text-gray-700"
-                  }`}>
-                    {log.action}
-                  </span>
-                  <span className="font-extrabold text-matte-black">{log.actor}</span>
-                  <span className="text-mid-gray">đối với</span>
-                  <span className="font-black text-matte-black">{log.targetName}</span>
+          {auditLogs.map((log) => {
+            const act = log.action || log.type || "SYSTEM";
+            return (
+              <div
+                key={log.id}
+                className="p-3 bg-warm-white/40 border border-[#e5e5e5] rounded-xl text-[11px] font-sans flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2"
+              >
+                <div className="space-y-1">
+                  <div className="flex items-center flex-wrap gap-2">
+                    <span className={`px-1.5 py-0.5 rounded font-black text-[8px] uppercase ${
+                      act.startsWith("BLOCK") ? "bg-red-100 text-red-700" :
+                      act.startsWith("CREATE") ? "bg-blue-100 text-blue-700" :
+                      act.startsWith("UPDATE") ? "bg-amber-100 text-amber-700" :
+                      "bg-gray-100 text-gray-700"
+                    }`}>
+                      {act}
+                    </span>
+                    <span className="font-extrabold text-matte-black">{log.actor}</span>
+                    {log.targetName && (
+                      <>
+                        <span className="text-mid-gray">đối với</span>
+                        <span className="font-black text-matte-black">{log.targetName}</span>
+                      </>
+                    )}
+                  </div>
+                  <p className="text-mid-gray leading-relaxed">{log.details}</p>
                 </div>
-                <p className="text-mid-gray leading-relaxed">{log.details}</p>
+                <span className="font-sans text-[9px] text-mid-gray shrink-0 self-end sm:self-center">
+                  {new Date(log.timestamp).toLocaleTimeString("vi-VN")} - {new Date(log.timestamp).toLocaleDateString("vi-VN")}
+                </span>
               </div>
-              <span className="font-mono text-[9px] text-mid-gray shrink-0 self-end sm:self-center">
-                {new Date(log.timestamp).toLocaleTimeString("vi-VN")} - {new Date(log.timestamp).toLocaleDateString("vi-VN")}
-              </span>
-            </div>
-          ))}
+            );
+          })}
         </div>
       </div>
 
@@ -695,7 +696,6 @@ export default function StaffModule({ staff, orders }: StaffModuleProps) {
                   onChange={(e) => setAddForm({ ...addForm, role: e.target.value as any })}
                   className="w-full bg-white border border-[#e5e5e5] rounded-xl px-3.5 py-2.5 text-xs font-sans text-matte-black focus:outline-none focus:border-purple-500"
                 >
-                  <option value="technician">Kỹ Thuật Viên (KTV)</option>
                   <option value="manager">Quản Lý Trạm</option>
                   <option value="accountant">Kế Toán</option>
                   <option value="master_admin">Master Admin</option>
@@ -712,7 +712,7 @@ export default function StaffModule({ staff, orders }: StaffModuleProps) {
                   placeholder="Mặc định: 123456"
                   value={addForm.pin}
                   onChange={(e) => setAddForm({ ...addForm, pin: e.target.value })}
-                  className="w-full bg-white border border-[#e5e5e5] rounded-xl px-3.5 py-2.5 text-xs font-mono font-bold tracking-widest text-matte-black focus:outline-none focus:border-purple-500"
+                  className="w-full bg-white border border-[#e5e5e5] rounded-xl px-3.5 py-2.5 text-xs font-sans font-bold tracking-widest text-matte-black focus:outline-none focus:border-purple-500"
                 />
               </div>
 
@@ -793,7 +793,6 @@ export default function StaffModule({ staff, orders }: StaffModuleProps) {
                   onChange={(e) => setEditForm({ ...editForm, role: e.target.value as any })}
                   className="w-full bg-white border border-[#e5e5e5] rounded-xl px-3.5 py-2.5 text-xs font-sans text-matte-black focus:outline-none focus:border-purple-500"
                 >
-                  <option value="technician">Kỹ Thuật Viên (KTV)</option>
                   <option value="manager">Quản Lý Trạm</option>
                   <option value="accountant">Kế Toán</option>
                   <option value="master_admin">Master Admin</option>
@@ -810,7 +809,7 @@ export default function StaffModule({ staff, orders }: StaffModuleProps) {
                   placeholder="Ví dụ: 123456"
                   value={editForm.pin}
                   onChange={(e) => setEditForm({ ...editForm, pin: e.target.value })}
-                  className="w-full bg-white border border-[#e5e5e5] rounded-xl px-3.5 py-2.5 text-xs font-mono font-bold tracking-widest text-matte-black focus:outline-none focus:border-purple-500"
+                  className="w-full bg-white border border-[#e5e5e5] rounded-xl px-3.5 py-2.5 text-xs font-sans font-bold tracking-widest text-matte-black focus:outline-none focus:border-purple-500"
                 />
               </div>
 

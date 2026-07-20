@@ -82,7 +82,7 @@ export const renderRichText = (text: string) => {
     .replace(/&lt;\/span&gt;/g, "</span>")
     .replace(/\*\*([^*]+)\*\*/g, "<strong>$1</strong>")
     .replace(/\*([^*]+)\*/g, "<em>$1</em>")
-    .replace(/`([^`]+)`/g, "<code class='bg-gray-100 text-red-500 px-1.5 py-0.5 rounded font-mono text-[10px]'>$1</code>")
+    .replace(/`([^`]+)`/g, "<code class='bg-gray-100 text-red-500 px-1.5 py-0.5 rounded text-[10px]'>$1</code>")
     .replace(/\n- ([^\n]+)/g, "<br/>• $1")
     .replace(/\n1\. ([^\n]+)/g, "<br/>1. $1")
     .replace(/\n/g, "<br/>");
@@ -767,7 +767,7 @@ export default function ServicesModule() {
                 </div>
 
                 <div className="flex items-center gap-4 w-full sm:w-auto justify-between sm:justify-end">
-                  <span className="font-mono text-forest-green font-black text-sm">
+                  <span className="font-sans text-forest-green font-black text-sm">
                     Giá đề xuất: {formatVnd(p.proposedPrice)}
                   </span>
                   
@@ -867,7 +867,7 @@ export default function ServicesModule() {
                     <div className="flex justify-between items-start gap-2 relative z-10">
                       <div>
                         <div className="flex items-center gap-1.5 flex-wrap">
-                          <span className="text-[10px] font-black font-mono tracking-wider opacity-60 uppercase">{pkg.code}</span>
+                          <span className="text-[10px] font-black font-sans tracking-wider opacity-60 uppercase">{pkg.code}</span>
                           
                           {pkg.label && (
                             <span className={`text-[9px] font-extrabold px-2 py-0.5 rounded-full uppercase tracking-widest ${badgeStyle}`}>
@@ -976,7 +976,7 @@ export default function ServicesModule() {
                       />
                       
                       <div className="absolute top-2 left-2 flex flex-col gap-1 items-start">
-                        <span className="bg-matte-black/75 backdrop-blur-sm text-white font-mono text-[8px] font-black px-1.5 py-0.5 rounded uppercase">
+                        <span className="bg-matte-black/75 backdrop-blur-sm text-white font-sans text-[8px] font-black px-1.5 py-0.5 rounded uppercase">
                           {add.code}
                         </span>
                         
@@ -1073,7 +1073,7 @@ export default function ServicesModule() {
               {/* Drawer Header */}
               <div className="p-6 border-b border-[#e5e5e5] flex justify-between items-center bg-warm-white relative">
                 <div>
-                  <span className="text-[9px] font-extrabold bg-matte-black text-white px-2 py-0.5 rounded uppercase tracking-widest font-mono">
+                  <span className="text-[9px] font-extrabold bg-matte-black text-white px-2 py-0.5 rounded uppercase tracking-widest font-sans">
                     Mã: {selectedService.code}
                   </span>
                   <h3 className="text-base font-black font-display text-matte-black uppercase mt-1">
@@ -1173,7 +1173,7 @@ export default function ServicesModule() {
                           required
                           value={editPrice}
                           onChange={(e) => setEditPrice(e.target.value)}
-                          className="w-full bg-white border border-[#e5e5e5] rounded-xl pl-8 pr-3 py-2.5 text-xs font-mono text-forest-green font-bold focus:outline-none focus:border-forest-green"
+                          className="w-full bg-white border border-[#e5e5e5] rounded-xl pl-8 pr-3 py-2.5 text-xs font-sans text-forest-green font-bold focus:outline-none focus:border-forest-green"
                         />
                         <DollarSign className="absolute left-2.5 top-3 h-4 w-4 text-forest-green opacity-75" />
                       </div>
@@ -1316,11 +1316,11 @@ export default function ServicesModule() {
                             <div key={b.itemId} className="p-3 flex items-center justify-between gap-4 bg-white hover:bg-gray-50 transition">
                               <div className="min-w-0 flex-1 space-y-0.5">
                                 <span className="font-extrabold text-matte-black block text-xs truncate">{b.itemName}</span>
-                                <span className="text-[9px] text-mid-gray font-mono block">Mã kho: {b.itemId}</span>
+                                <span className="text-[9px] text-mid-gray font-sans block">Mã kho: {b.itemId}</span>
                               </div>
 
                               <div className="text-right shrink-0">
-                                <span className="font-mono font-bold text-forest-green text-sm">
+                                <span className="font-sans font-bold text-forest-green text-sm">
                                   {b.amount}
                                 </span>
                                 <span className="text-[9px] text-mid-gray ml-1 font-bold">{b.unit}</span>
@@ -1372,7 +1372,7 @@ export default function ServicesModule() {
                               min="0.01"
                               value={bomAmountInput}
                               onChange={(e) => setBomAmountInput(e.target.value)}
-                              className="w-full bg-white border border-gray-250 rounded-lg p-2 text-xs font-mono font-bold text-center"
+                              className="w-full bg-white border border-gray-250 rounded-lg p-2 text-xs font-sans font-bold text-center"
                             />
                           </div>
 
@@ -1427,7 +1427,7 @@ export default function ServicesModule() {
                       VÙNG NGUY HIỂM: XÓA DỊCH VỤ
                     </div>
                     <p className="text-[10px] text-red-650 leading-relaxed font-sans">
-                      Vui lòng nhập mã gói <strong className="font-mono text-red-900 bg-red-100 px-1 py-0.5 rounded">{selectedService.code}</strong> để xác nhận xóa vĩnh viễn dịch vụ này.
+                      Vui lòng nhập mã gói <strong className="font-sans text-red-900 bg-red-100 px-1 py-0.5 rounded">{selectedService.code}</strong> để xác nhận xóa vĩnh viễn dịch vụ này.
                     </p>
                     <div className="flex gap-2">
                       <input
@@ -1435,7 +1435,7 @@ export default function ServicesModule() {
                         placeholder="Nhập mã gói..."
                         value={deleteConfirmCode}
                         onChange={(e) => setDeleteConfirmCode(e.target.value)}
-                        className="flex-1 bg-white border border-red-200 rounded-lg px-2.5 py-1.5 text-xs font-mono font-bold text-matte-black uppercase focus:outline-none focus:border-red-500 shadow-sm"
+                        className="flex-1 bg-white border border-red-200 rounded-lg px-2.5 py-1.5 text-xs font-sans font-bold text-matte-black uppercase focus:outline-none focus:border-red-500 shadow-sm"
                       />
                       <button
                         type="button"
@@ -1526,7 +1526,7 @@ export default function ServicesModule() {
                     placeholder="Ví dụ: W5, ADD-09"
                     value={newServiceForm.code}
                     onChange={(e) => setNewServiceForm({ ...newServiceForm, code: e.target.value.toUpperCase() })}
-                    className="w-full bg-white border border-[#e5e5e5] rounded-xl px-3.5 py-2.5 text-xs font-mono font-bold text-matte-black focus:outline-none focus:border-forest-green"
+                    className="w-full bg-white border border-[#e5e5e5] rounded-xl px-3.5 py-2.5 text-xs font-sans font-bold text-matte-black focus:outline-none focus:border-forest-green"
                   />
                 </div>
               </div>

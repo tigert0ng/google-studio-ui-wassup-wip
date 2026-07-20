@@ -1044,7 +1044,7 @@ export default function CrmModule({ customers, vouchers, orders = [] }: CrmModul
         <div className="flex items-center gap-2 text-xs text-gray-400 font-sans font-medium">
           <Shield className="h-4 w-4 text-[#A2C62C]" />
           <span>PHÂN QUYỀN HỆ THỐNG OS:</span>
-          <span className="text-white font-extrabold uppercase font-mono bg-white/10 px-2 py-0.5 rounded">
+          <span className="text-white font-extrabold uppercase font-sans bg-white/10 px-2 py-0.5 rounded">
             {role === "master_admin" ? "MASTER ADMIN (TOÀN QUYỀN)" : "QUẢN LÝ VẬN HÀNH"}
           </span>
         </div>
@@ -1365,13 +1365,13 @@ export default function CrmModule({ customers, vouchers, orders = [] }: CrmModul
                           </div>
                           <div>
                             <span className="block">{cust.name}</span>
-                            <span className="text-[9px] text-slate-400 normal-case font-normal font-mono">
+                            <span className="text-[9px] text-slate-400 normal-case font-normal font-sans">
                               ID: {cust.id}
                             </span>
                           </div>
                         </div>
                       </td>
-                      <td className="p-4 font-mono font-bold text-slate-600">
+                      <td className="p-4 font-sans font-bold text-slate-600">
                         {cust.phone}
                       </td>
                       <td className="p-4">
@@ -1382,7 +1382,7 @@ export default function CrmModule({ customers, vouchers, orders = [] }: CrmModul
                             plates.map((plate) => (
                               <span
                                 key={plate}
-                                className="inline-flex px-2 py-0.5 bg-stone-100 text-slate-800 rounded font-mono font-bold text-[9px] border border-stone-200"
+                                className="inline-flex px-2 py-0.5 bg-stone-100 text-slate-800 rounded font-sans font-bold text-[9px] border border-stone-200"
                               >
                                 {plate}
                               </span>
@@ -1401,7 +1401,7 @@ export default function CrmModule({ customers, vouchers, orders = [] }: CrmModul
                           {cust.points} SUP
                         </span>
                       </td>
-                      <td className="p-4 text-right font-mono font-extrabold text-slate-900 text-xs">
+                      <td className="p-4 text-right font-sans font-extrabold text-slate-900 text-xs">
                         {formatVnd(totalSpent)}
                       </td>
                       <td className="p-4 text-center" onClick={(e) => e.stopPropagation()}>
@@ -1678,7 +1678,7 @@ export default function CrmModule({ customers, vouchers, orders = [] }: CrmModul
                         <tr key={v.id} className="hover:bg-stone-50/50 transition">
                           <td className="p-4 pl-6 text-left">
                             <div className="flex items-center gap-2">
-                              <span className="px-2 py-0.5 bg-slate-900 text-white rounded font-mono font-extrabold text-[10px] tracking-wider uppercase">
+                              <span className="px-2 py-0.5 bg-slate-900 text-white rounded font-sans font-extrabold text-[10px] tracking-wider uppercase">
                                 {v.code}
                               </span>
                               <span className="text-slate-800 font-bold font-sans text-xs">
@@ -1711,7 +1711,7 @@ export default function CrmModule({ customers, vouchers, orders = [] }: CrmModul
                               Giới hạn: {v.usage_limit_per_customer || 1} lần/khách
                             </span>
                           </td>
-                          <td className="p-4 text-slate-500 font-mono text-[10px] text-left">
+                          <td className="p-4 text-slate-500 font-sans text-[10px] text-left">
                             {new Date(v.validFrom).toLocaleDateString("vi-VN")} - {new Date(v.validTo).toLocaleDateString("vi-VN")}
                           </td>
                           <td className="p-4 text-center">
@@ -1948,14 +1948,14 @@ export default function CrmModule({ customers, vouchers, orders = [] }: CrmModul
                   <div className="bg-white border border-stone-200 rounded-2xl p-5 shadow-xs space-y-3.5 relative" id="sidebar-profile-card">
                     <div className="flex justify-between items-start">
                       <div>
-                        <span className="text-[9px] text-[#A2C62C] font-black uppercase tracking-widest block font-mono">
+                        <span className="text-[9px] text-[#A2C62C] font-black uppercase tracking-widest block font-sans">
                           THẺ HỘI VIÊN CHÍNH THỨC
                         </span>
                         <h3 className="text-xl font-black font-display uppercase tracking-tight text-slate-900 mt-1">
                           {selectedCustomer.name}
                         </h3>
                       </div>
-                      <span className="px-2.5 py-1 bg-slate-900 text-[#A2C62C] font-black text-[10px] rounded uppercase font-mono tracking-wider">
+                      <span className="px-2.5 py-1 bg-slate-900 text-[#A2C62C] font-black text-[10px] rounded uppercase font-sans tracking-wider">
                         {selectedCustomer.points >= 300 ? "VIP DIAMOND" : selectedCustomer.points >= 100 ? "GOLD" : "MEMBER"}
                       </span>
                     </div>
@@ -1965,7 +1965,7 @@ export default function CrmModule({ customers, vouchers, orders = [] }: CrmModul
                         <Phone className="h-4 w-4 text-slate-400" />
                         <div>
                           <span className="text-[9px] text-slate-400 block font-black uppercase">SỐ ĐIỆN THOẠI</span>
-                          <span className="font-mono font-bold">{selectedCustomer.phone}</span>
+                          <span className="font-sans font-bold">{selectedCustomer.phone}</span>
                         </div>
                       </div>
                       
@@ -2013,8 +2013,8 @@ export default function CrmModule({ customers, vouchers, orders = [] }: CrmModul
                       {/* Highlighted Spent */}
                       <div className="bg-emerald-500/5 border border-emerald-500/15 rounded-2xl p-5 flex items-center justify-between" id="highlight-spent-card">
                         <div>
-                          <span className="text-[9px] text-emerald-800 font-extrabold tracking-wider block uppercase font-mono">TỔNG CHI TIÊU HỘI VIÊN</span>
-                          <span className="text-2xl font-black font-mono text-emerald-700 tracking-tight block mt-1">
+                          <span className="text-[9px] text-emerald-800 font-extrabold tracking-wider block uppercase font-sans">TỔNG CHI TIÊU HỘI VIÊN</span>
+                          <span className="text-2xl font-black font-sans text-emerald-700 tracking-tight block mt-1">
                             {formatVnd(calculateCustomerTotalSpent(selectedCustomer))}
                           </span>
                         </div>
@@ -2050,7 +2050,7 @@ export default function CrmModule({ customers, vouchers, orders = [] }: CrmModul
                                 type="button"
                                 key={v.plate}
                                 onClick={() => setHistoryPlateFilter(v.plate)}
-                                className={`px-3 py-2 rounded-xl border text-xs font-bold font-mono transition cursor-pointer flex items-center gap-1.5 ${
+                                className={`px-3 py-2 rounded-xl border text-xs font-bold font-sans transition cursor-pointer flex items-center gap-1.5 ${
                                   activeHistoryPlate === v.plate
                                     ? "bg-[#A2C62C] border-[#A2C62C] text-slate-950 shadow-sm"
                                     : "bg-stone-50 border-stone-200 text-slate-600 hover:bg-stone-100"
@@ -2075,7 +2075,7 @@ export default function CrmModule({ customers, vouchers, orders = [] }: CrmModul
                                   placeholder="Ví dụ: 30A-999.99..."
                                   value={newVehiclePlate}
                                   onChange={(e) => setNewVehiclePlate(e.target.value.toUpperCase())}
-                                  className="w-full bg-white border border-stone-200 rounded-lg px-2.5 py-1.5 text-xs font-mono font-bold focus:outline-none"
+                                  className="w-full bg-white border border-stone-200 rounded-lg px-2.5 py-1.5 text-xs font-sans font-bold focus:outline-none"
                                 />
                               </div>
                               
@@ -2119,7 +2119,7 @@ export default function CrmModule({ customers, vouchers, orders = [] }: CrmModul
                         {/* History Table */}
                         <div className="pt-2">
                           <div className="text-[10px] font-black text-slate-400 uppercase mb-2">
-                            LỊCH SỬ THI CÔNG CHI TIẾT CỦA XE <span className="text-forest-green font-mono font-extrabold">{activeHistoryPlate || "CHƯA CÓ CHỌN"}</span>
+                            LỊCH SỬ THI CÔNG CHI TIẾT CỦA XE <span className="text-forest-green font-sans font-extrabold">{activeHistoryPlate || "CHƯA CÓ CHỌN"}</span>
                           </div>
                           
                           <div className="overflow-x-auto border border-stone-150 rounded-xl bg-white">
@@ -2149,11 +2149,11 @@ export default function CrmModule({ customers, vouchers, orders = [] }: CrmModul
                                         })}
                                       </td>
                                       <td className="p-3">
-                                        <span className="inline-flex px-1.5 py-0.5 bg-slate-900 text-[#A2C62C] font-black text-[9px] rounded font-mono">
+                                        <span className="inline-flex px-1.5 py-0.5 bg-slate-900 text-[#A2C62C] font-black text-[9px] rounded font-sans">
                                           {o.packageCode}
                                         </span>
                                       </td>
-                                      <td className="p-3 text-right font-mono font-extrabold text-slate-900">
+                                      <td className="p-3 text-right font-sans font-extrabold text-slate-900">
                                         {formatVnd(o.total)}
                                       </td>
                                       <td className="p-3 text-center pr-4">
@@ -2191,7 +2191,7 @@ export default function CrmModule({ customers, vouchers, orders = [] }: CrmModul
                       <div>
                         <span className="text-[8px] text-amber-800 font-extrabold tracking-wider block uppercase">ĐIỂM TÍCH LŨY</span>
                         <div className="flex items-baseline gap-2 mt-1">
-                          <span className="text-2xl font-black font-mono text-amber-700 tracking-tight">
+                          <span className="text-2xl font-black font-sans text-amber-700 tracking-tight">
                             {selectedCustomer.points} SUP
                           </span>
                           <button
@@ -2258,7 +2258,7 @@ export default function CrmModule({ customers, vouchers, orders = [] }: CrmModul
                           <div className="absolute top-1/2 -right-2 h-4 w-4 rounded-full bg-white border border-[#A2C62C] -translate-y-1/2" />
 
                           <div className="pl-3.5 space-y-0.5">
-                            <span className="text-[11px] font-black font-mono tracking-wider text-forest-green uppercase flex items-center gap-1">
+                            <span className="text-[11px] font-black font-sans tracking-wider text-forest-green uppercase flex items-center gap-1">
                               <Tag className="h-3 w-3" /> {v.code}
                             </span>
                             <span className="text-[10px] text-slate-700 font-sans block leading-none">
@@ -2372,7 +2372,7 @@ export default function CrmModule({ customers, vouchers, orders = [] }: CrmModul
                       placeholder="Ví dụ: 30A-123.45..."
                       value={cLicensePlate}
                       onChange={(e) => setCLicensePlate(e.target.value.toUpperCase())}
-                      className="w-full bg-white border border-[#e5e5e5] rounded-xl px-3.5 py-2.5 text-xs font-mono font-bold text-matte-black focus:outline-none focus:border-[#A2C62C]"
+                      className="w-full bg-white border border-[#e5e5e5] rounded-xl px-3.5 py-2.5 text-xs font-sans font-bold text-matte-black focus:outline-none focus:border-[#A2C62C]"
                     />
                   </div>
 
@@ -2650,7 +2650,7 @@ export default function CrmModule({ customers, vouchers, orders = [] }: CrmModul
                           }`}>
                             {row.pointsChanged >= 0 ? `+${row.pointsChanged}` : row.pointsChanged}
                           </td>
-                          <td className="p-3 text-center font-mono font-extrabold text-slate-800">
+                          <td className="p-3 text-center font-sans font-extrabold text-slate-800">
                             {row.balanceAfter} SUP
                           </td>
                           <td className="p-3 pr-4 text-slate-500 font-medium max-w-xs truncate" title={row.reason}>
@@ -2710,7 +2710,7 @@ export default function CrmModule({ customers, vouchers, orders = [] }: CrmModul
                     placeholder="Ví dụ: SUP2026, SUPVIP"
                     value={vCode}
                     onChange={(e) => setVCode(e.target.value.toUpperCase())}
-                    className="w-full bg-white border border-[#e5e5e5] rounded-xl px-3 py-2 text-xs font-mono font-bold text-matte-black focus:outline-none focus:border-[#A2C62C] disabled:bg-stone-50"
+                    className="w-full bg-white border border-[#e5e5e5] rounded-xl px-3 py-2 text-xs font-sans font-bold text-matte-black focus:outline-none focus:border-[#A2C62C] disabled:bg-stone-50"
                   />
                 </div>
 
@@ -2939,7 +2939,7 @@ export default function CrmModule({ customers, vouchers, orders = [] }: CrmModul
                                 }
                               }}
                             />
-                            <span className="font-bold">{c.name}</span> - <span className="font-mono text-stone-500 text-[10px]">{c.phone}</span>
+                            <span className="font-bold">{c.name}</span> - <span className="font-sans text-stone-500 text-[10px]">{c.phone}</span>
                           </label>
                         );
                       })}
@@ -3111,7 +3111,7 @@ export default function CrmModule({ customers, vouchers, orders = [] }: CrmModul
                               }
                             }}
                           />
-                          <span className="font-bold">{c.name}</span> - <span className="text-[10px] text-stone-500 font-mono">{c.phone}</span>
+                          <span className="font-bold">{c.name}</span> - <span className="text-[10px] text-stone-500 font-sans">{c.phone}</span>
                         </label>
                       );
                     })}
@@ -3171,7 +3171,7 @@ export default function CrmModule({ customers, vouchers, orders = [] }: CrmModul
                   <div className="bg-stone-50 p-4 rounded-xl border border-stone-200 space-y-2">
                     <span className="text-[10px] font-black text-stone-500 uppercase block">Thông tin cơ bản</span>
                     <div className="flex items-center gap-2">
-                      <span className="px-2.5 py-1 bg-slate-900 text-[#A2C62C] font-mono font-black text-xs rounded tracking-wider uppercase">
+                      <span className="px-2.5 py-1 bg-slate-900 text-[#A2C62C] font-sans font-black text-xs rounded tracking-wider uppercase">
                         {v.code}
                       </span>
                       <span className={`px-2 py-0.5 rounded text-[10px] font-black uppercase border ${statusColor}`}>
@@ -3218,7 +3218,7 @@ export default function CrmModule({ customers, vouchers, orders = [] }: CrmModul
                 <div className="space-y-2">
                   <div className="flex items-center justify-between">
                     <span className="text-xs font-black text-slate-800 uppercase tracking-wide">Nhật ký sử dụng / Áp dụng thực tế (S4.8/S4.10)</span>
-                    <span className="text-[10px] bg-slate-100 px-2 py-0.5 rounded font-mono font-bold text-slate-600">
+                    <span className="text-[10px] bg-slate-100 px-2 py-0.5 rounded font-sans font-bold text-slate-600">
                       {voucherRed.length} bản ghi kiểm toán
                     </span>
                   </div>
@@ -3238,15 +3238,15 @@ export default function CrmModule({ customers, vouchers, orders = [] }: CrmModul
                           const c = customers.find(x => x.id === r.customerId);
                           return (
                             <tr key={r.id} className="hover:bg-stone-50 transition">
-                              <td className="p-2.5 pl-4 text-stone-500 font-mono text-[10px]">
+                              <td className="p-2.5 pl-4 text-stone-500 font-sans text-[10px]">
                                 {new Date(r.redeemedAt).toLocaleString("vi-VN")}
                               </td>
                               <td className="p-2.5">
                                 <span className="font-bold text-slate-800">{c ? c.name : "Khách vãng lai"}</span>
-                                <span className="block text-[9px] text-stone-400 font-mono">{c ? c.phone : ""}</span>
+                                <span className="block text-[9px] text-stone-400 font-sans">{c ? c.phone : ""}</span>
                               </td>
-                              <td className="p-2.5 font-mono text-stone-600">{r.orderId}</td>
-                              <td className="p-2.5 text-right pr-4 font-black font-mono text-emerald-600">
+                              <td className="p-2.5 font-sans text-stone-600">{r.orderId}</td>
+                              <td className="p-2.5 text-right pr-4 font-black font-sans text-emerald-600">
                                 -{formatVnd(r.discountApplied)}
                               </td>
                             </tr>

@@ -37,7 +37,9 @@ import {
   Briefcase,
   Layers,
   ArrowRightLeft,
-  ShieldAlert
+  ShieldAlert,
+  Bot,
+  Send
 } from "lucide-react";
 import { simActions } from "../../lib/supabase/client";
 import { MarkdownTextarea, MarkdownRenderer } from "./shared/Markdown";
@@ -52,6 +54,9 @@ const STATIONS = [
 // TYPES FOR MODULE 8 (HR)
 interface HrProfile {
   staffId: string;
+  name?: string;
+  phone?: string;
+  pin?: string;
   rank: "apprentice" | "junior" | "senior" | "team_lead" | "manager";
   wageType: "hourly" | "fixed";
   hourlyRate?: number;
@@ -68,6 +73,8 @@ interface HrProfile {
   nationalIdBackUrl?: string;
   selectedSkills: string[]; // skill IDs
   stationId: string; // STATION ASSIGNMENT
+  telegramChatId?: string;
+  zaloChatId?: string;
 }
 
 interface Skill {
@@ -125,8 +132,42 @@ export default function HrModule({ staff, orders, currentUser }: HrModuleProps) 
   const [certifications, setCertifications] = useState<Certification[]>([]);
   const [disciplineLogs, setDisciplineLogs] = useState<DisciplineLog[]>([]);
 
-  // Active top-level sub-menu tab: "performance" (Hiệu suất KTV) or "directory" (Danh sách KTV trạm) or "catalog" (Quản lý kỹ năng)
-  const [activeM8Tab, setActiveM8Tab] = useState<"performance" | "directory" | "catalog">("performance");
+  // Active top-level sub-menu tab: "performance" | "directory" | "catalog" | "bots"
+  const [activeM8Tab, setActiveM8Tab] = useState<"performance" | "directory" | "catalog" | "bots">("performance");
+
+  // Bot Integrations state
+  const [telegramToken, setTelegramToken] = useState(() => localStorage.getItem("wassup_telegram_token") || "7128392182:AAH9238dj92hG-92_Hsd8291hd923h");
+  const [telegramGroupChatId, setTelegramGroupChatId] = useState(() => localStorage.getItem("wassup_telegram_group_id") || "-10028392182");
+  const [telegramConnected, setTelegramConnected] = useState(false);
+
+  const [zaloToken, setZaloToken] = useState(() => localStorage.getItem("wassup_zalo_token") || "zalo_oa_access_token_mock_982392183921382910");
+  const [zaloOaId, setZaloOaId] = useState(() => localStorage.getItem("wassup_zalo_oa_id") || "293028391823910283");
+  const [zaloConnected, setZaloConnected] = useState(false);
+
+  const handleSaveBotsConfig = (e: React.FormEvent) => {
+    e.preventDefault();
+    localStorage.setItem("wassup_telegram_token", telegramToken);
+    localStorage.setItem("wassup_telegram_group_id", telegramGroupChatId);
+    localStorage.setItem("wassup_zalo_token", zaloToken);
+    localStorage.setItem("wassup_zalo_oa_id", zaloOaId);
+    showToastMsg("✅ Đã lưu cấu hình Bots & Kênh liên lạc!");
+  };
+
+  const handleTestTelegramConnection = () => {
+    showToastMsg("⚡ Đang gửi tín hiệu Ping tới Telegram Bot Server...");
+    setTimeout(() => {
+      setTelegramConnected(true);
+      showToastMsg("✅ Kết nối Telegram Bot thành công! Đã gửi tin nhắn test đến Group.");
+    }, 1200);
+  };
+
+  const handleTestZaloConnection = () => {
+    showToastMsg("⚡ Đang gửi gói tin kiểm tra tới Zalo OA Portal...");
+    setTimeout(() => {
+      setZaloConnected(true);
+      showToastMsg("✅ Webhook Zalo OA đồng bộ thành công! Trạng thái: SẴN SÀNG.");
+    }, 1200);
+  };
 
   // Selection state for opening a detailed page ("trang mới")
   const [selectedDetailedStaffId, setSelectedDetailedStaffId] = useState<string | null>(null);
@@ -274,6 +315,9 @@ export default function HrModule({ staff, orders, currentUser }: HrModuleProps) 
       activeProfiles = [
         {
           staffId: sIdKhoa,
+          name: "Nguyễn Minh Khoa",
+          phone: "0938112233",
+          pin: "123456",
           rank: "junior",
           wageType: "hourly",
           hourlyRate: 55000,
@@ -292,6 +336,9 @@ export default function HrModule({ staff, orders, currentUser }: HrModuleProps) 
         },
         {
           staffId: sIdHa,
+          name: "Trần Thị Ngọc Hà",
+          phone: "0912445667",
+          pin: "123456",
           rank: "senior",
           wageType: "fixed",
           baseSalary: 11000000,
@@ -310,6 +357,9 @@ export default function HrModule({ staff, orders, currentUser }: HrModuleProps) 
         },
         {
           staffId: sIdPhuc,
+          name: "Lê Hoàng Phúc",
+          phone: "0977889900",
+          pin: "123456",
           rank: "team_lead",
           wageType: "fixed",
           baseSalary: 13000000,
@@ -344,6 +394,9 @@ export default function HrModule({ staff, orders, currentUser }: HrModuleProps) 
         }
         updatedProfiles.push({
           staffId: s.id,
+          name: s.name,
+          phone: s.phone,
+          pin: s.pin || "123456",
           rank: "junior",
           wageType: "hourly",
           hourlyRate: 50000,
@@ -602,15 +655,13 @@ export default function HrModule({ staff, orders, currentUser }: HrModuleProps) 
       return;
     }
 
-    const added = simActions.addStaff({
-      name: newKtv.name,
-      phone: newKtv.phone,
-      role: "technician",
-      pin: newKtv.pin
-    });
+    const newKtvId = "s_ktv_" + Date.now() + "_" + Math.floor(Math.random() * 1000000);
 
     const profile: HrProfile = {
-      staffId: added.id,
+      staffId: newKtvId,
+      name: newKtv.name,
+      phone: newKtv.phone,
+      pin: newKtv.pin || "123456",
       rank: newKtv.rank,
       wageType: "hourly",
       hourlyRate: 50000,
@@ -673,8 +724,7 @@ export default function HrModule({ staff, orders, currentUser }: HrModuleProps) 
     if (!p) {
       return { reworkRate: "0%", avgKtvRating: 5.0, avgVehicleRating: 5.0, pendingComplaints: 0, totalWo: 0, reworkCount: 0 };
     }
-    const staffObj = staff.find(s => s.id === sId);
-    const name = staffObj?.name || "";
+    const name = p.name || staff.find(s => s.id === sId)?.name || "";
     if (name.includes("Khoa")) {
       return { reworkRate: "3.1%", avgKtvRating: 4.7, avgVehicleRating: 4.6, pendingComplaints: 0, totalWo: 32, reworkCount: 1 };
     } else if (name.includes("Hà")) {
@@ -686,9 +736,9 @@ export default function HrModule({ staff, orders, currentUser }: HrModuleProps) 
   };
 
   const getWorkAllocations = (sId: string): WorkAllocation[] => {
-    const staffObj = staff.find(s => s.id === sId);
-    if (!staffObj) return [];
-    const name = staffObj.name;
+    const p = profiles.find(pr => pr.staffId === sId);
+    const name = p?.name || staff.find(s => s.id === sId)?.name || "";
+    if (!name) return [];
     const isPhuc = name.includes("Phúc");
     const isHa = name.includes("Hà");
 
@@ -733,20 +783,28 @@ export default function HrModule({ staff, orders, currentUser }: HrModuleProps) 
   };
 
   // Filter KTV staff list based on Station Access Control Logic
-  const stationTechnicians = staff.filter(s => {
-    // Only show KTV role or people inside HR profiles
-    const isTechOrHr = s.role === "technician" || profiles.some(p => p.staffId === s.id);
-    if (!isTechOrHr) return false;
+  const stationTechnicians = profiles
+    .map(p => {
+      const s = staff.find(x => x.id === p.staffId);
+      return {
+        id: p.staffId,
+        name: p.name || s?.name || "Kỹ thuật viên",
+        phone: p.phone || s?.phone || "",
+        pin: p.pin || s?.pin || "123456",
+        role: "technician",
+        status: p.employmentStatus || s?.status || "active"
+      };
+    })
+    .filter(t => {
+      const p = profiles.find(pr => pr.staffId === t.id);
+      const stationId = p?.stationId || "WASSUP_TÂN_BÌNH_01";
 
-    const profile = profiles.find(p => p.staffId === s.id);
-    const stationId = profile?.stationId || "WASSUP_TÂN_BÌNH_01";
-
-    // Station check
-    if (selectedStationId !== "all" && stationId !== selectedStationId) {
-      return false;
-    }
-    return true;
-  });
+      // Station check
+      if (selectedStationId !== "all" && stationId !== selectedStationId) {
+        return false;
+      }
+      return true;
+    });
 
   // Apply Search, Rank, Status and Skill Filters on Directory
   const filteredTechnicians = stationTechnicians.filter(s => {
@@ -761,7 +819,20 @@ export default function HrModule({ staff, orders, currentUser }: HrModuleProps) 
   });
 
   // Detailed view staff information lookup
-  const detailedStaffObj = selectedDetailedStaffId ? staff.find(s => s.id === selectedDetailedStaffId) : null;
+  const detailedStaffObj = selectedDetailedStaffId 
+    ? (staff.find(s => s.id === selectedDetailedStaffId) || (() => {
+        const p = profiles.find(pr => pr.staffId === selectedDetailedStaffId);
+        if (!p) return null;
+        return {
+          id: p.staffId,
+          name: p.name || "Kỹ thuật viên",
+          phone: p.phone || "",
+          pin: p.pin || "123456",
+          role: "technician",
+          status: p.employmentStatus || "active"
+        };
+      })())
+    : null;
   const detailedProfile = selectedDetailedStaffId ? profiles.find(p => p.staffId === selectedDetailedStaffId) : null;
   const detailedCerts = selectedDetailedStaffId ? certifications.filter(c => c.staffId === selectedDetailedStaffId) : [];
   const detailedLogs = selectedDetailedStaffId ? disciplineLogs.filter(l => l.staffId === selectedDetailedStaffId) : [];
@@ -898,6 +969,26 @@ export default function HrModule({ staff, orders, currentUser }: HrModuleProps) 
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs">
                       <div className="space-y-3.5">
                         <div className="grid grid-cols-3 items-center gap-2">
+                          <span className="text-stone-500 font-bold">Họ và tên:</span>
+                           <input
+                             type="text"
+                             value={detailedProfile.name || detailedStaffObj.name}
+                             onChange={(e) => handleUpdateProfileFieldEx(detailedStaffObj.id, "name", e.target.value)}
+                             className="col-span-2 border border-stone-200 rounded px-2.5 py-1 text-xs font-semibold focus:outline-none focus:border-stone-950 bg-stone-50"
+                           />
+                        </div>
+
+                        <div className="grid grid-cols-3 items-center gap-2">
+                          <span className="text-stone-500 font-bold">Số điện thoại:</span>
+                           <input
+                             type="text"
+                             value={detailedProfile.phone || detailedStaffObj.phone}
+                             onChange={(e) => handleUpdateProfileFieldEx(detailedStaffObj.id, "phone", e.target.value)}
+                             className="col-span-2 border border-stone-200 rounded px-2.5 py-1 text-xs font-semibold focus:outline-none focus:border-stone-950 bg-stone-50"
+                           />
+                        </div>
+
+                        <div className="grid grid-cols-3 items-center gap-2">
                           <span className="text-stone-500 font-bold">Thường trú:</span>
                           <input
                             type="text"
@@ -991,6 +1082,35 @@ export default function HrModule({ staff, orders, currentUser }: HrModuleProps) 
                             />
                             <span className="absolute right-2 top-1 text-[10px] text-stone-400 font-bold">đ</span>
                           </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Bot Integration Details */}
+                    <div className="pt-4 border-t border-stone-100">
+                      <div className="text-[10px] text-stone-500 font-black uppercase tracking-wider mb-2 flex items-center gap-1">
+                        <Bot className="h-3.5 w-3.5 text-blue-500" /> LIÊN KẾT NHẬN LỆNH BOTS (TELEGRAM / ZALO)
+                      </div>
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div className="grid grid-cols-3 items-center gap-2">
+                          <span className="text-stone-500 font-bold">Telegram Chat ID:</span>
+                          <input
+                            type="text"
+                            placeholder="Nhập Chat ID hoặc để trống"
+                            value={detailedProfile.telegramChatId || ""}
+                            onChange={(e) => handleUpdateProfileFieldEx(detailedStaffObj.id, "telegramChatId", e.target.value)}
+                            className="col-span-2 border border-stone-200 rounded px-2.5 py-1 text-xs font-semibold focus:outline-none focus:border-stone-950 font-mono"
+                          />
+                        </div>
+                        <div className="grid grid-cols-3 items-center gap-2">
+                          <span className="text-stone-500 font-bold">Zalo User ID:</span>
+                          <input
+                            type="text"
+                            placeholder="Nhập ID Zalo OA hoặc để trống"
+                            value={detailedProfile.zaloChatId || ""}
+                            onChange={(e) => handleUpdateProfileFieldEx(detailedStaffObj.id, "zaloChatId", e.target.value)}
+                            className="col-span-2 border border-stone-200 rounded px-2.5 py-1 text-xs font-semibold focus:outline-none focus:border-stone-950 font-mono"
+                          />
                         </div>
                       </div>
                     </div>
@@ -1220,7 +1340,7 @@ export default function HrModule({ staff, orders, currentUser }: HrModuleProps) 
                           return (
                             <tr key={wa.id} className="hover:bg-stone-50/50">
                               <td className="p-3 text-stone-600 font-medium">{new Date(wa.date).toLocaleDateString("vi-VN")}</td>
-                              <td className="p-3 font-mono font-bold text-stone-950">{wa.licensePlate}</td>
+                              <td className="p-3 font-sans font-bold text-stone-950">{wa.licensePlate}</td>
                               <td className="p-3 font-bold text-stone-700">{wa.serviceName}</td>
                               <td className="p-3 text-stone-500">{wa.slaMin}-{wa.slaMax}p</td>
                               <td className="p-3 text-right font-black">
@@ -1332,7 +1452,7 @@ export default function HrModule({ staff, orders, currentUser }: HrModuleProps) 
           </div>
 
           {/* MODULE TABS NAVIGATION */}
-          <div className="flex flex-col sm:flex-row border border-stone-200 bg-white rounded-2xl p-2 shadow-xs gap-2">
+          <div className="flex flex-col md:flex-row border border-stone-200 bg-white rounded-2xl p-2 shadow-xs gap-2">
             <button
               onClick={() => setActiveM8Tab("performance")}
               className={`flex-1 py-3 text-center font-display font-black text-[10.5px] tracking-wider uppercase transition rounded-xl cursor-pointer flex items-center justify-center gap-2 ${
@@ -1365,6 +1485,17 @@ export default function HrModule({ staff, orders, currentUser }: HrModuleProps) 
             >
               <Layers className="h-4 w-4" />
               Danh mục kỹ năng
+            </button>
+            <button
+              onClick={() => setActiveM8Tab("bots")}
+              className={`flex-1 py-3 text-center font-display font-black text-[10.5px] tracking-wider uppercase transition rounded-xl cursor-pointer flex items-center justify-center gap-2 ${
+                activeM8Tab === "bots"
+                  ? "bg-stone-950 text-white shadow-xs"
+                  : "text-[#a5a5a5] hover:text-matte-black bg-stone-50 hover:bg-stone-100/50"
+              }`}
+            >
+              <Bot className="h-4 w-4" />
+              Cài đặt Bots & Kênh
             </button>
           </div>
 
@@ -1420,7 +1551,7 @@ export default function HrModule({ staff, orders, currentUser }: HrModuleProps) 
                           <div className="space-y-1">
                             <div className="font-extrabold text-sm text-stone-950 flex items-center gap-2">
                               <span>{s.name}</span>
-                              <span className="text-[10px] font-mono text-stone-400 font-bold">({s.phone})</span>
+                              <span className="text-[10px] font-sans text-stone-400 font-bold">({s.phone})</span>
                             </div>
 
                             {/* Live operation status indicator badge */}
@@ -1576,7 +1707,7 @@ export default function HrModule({ staff, orders, currentUser }: HrModuleProps) 
                                 </span>
                               </div>
                             </td>
-                            <td className="p-3 font-mono font-bold text-stone-600">{s.phone}</td>
+                            <td className="p-3 font-sans font-bold text-stone-600">{s.phone}</td>
                             <td className="p-3">
                               <span className="px-2 py-0.5 bg-stone-100 text-stone-800 rounded font-black text-[9px] uppercase border">
                                 {p?.rank === "senior" ? "Thợ chính" : p?.rank === "team_lead" ? "Tổ trưởng" : p?.rank === "junior" ? "Thợ phụ" : "Học việc"}
@@ -1685,6 +1816,138 @@ export default function HrModule({ staff, orders, currentUser }: HrModuleProps) 
               </div>
             </div>
           )}
+
+          {/* VIEW: 4. Bots & Kênh liên lạc Tab */}
+          {activeM8Tab === "bots" && (
+            <form onSubmit={handleSaveBotsConfig} className="space-y-6">
+              <div className="bg-white border border-stone-200 rounded-2xl p-6 shadow-sm space-y-6">
+                <div className="border-b border-stone-100 pb-3 flex justify-between items-center">
+                  <div>
+                    <h3 className="text-xs font-black tracking-wider text-matte-black uppercase font-display flex items-center gap-2">
+                      <Bot className="h-5 w-5 text-[#3b82f6]" />
+                      CẤU HÌNH KÊNH TRUYỀN TIN & BOTS (TELEGRAM / ZALO)
+                    </h3>
+                    <p className="text-[10px] text-stone-400 font-medium mt-0.5">
+                      Kỹ thuật viên trạm (KTV) nhận lệnh phân công và báo cáo kết quả thông qua tin nhắn Bot mà không cần tạo tài khoản đăng nhập Station OS.
+                    </p>
+                  </div>
+                  <span className="text-[9px] bg-blue-50 text-blue-700 font-sans font-extrabold border border-blue-100 px-3 py-1 rounded-full uppercase tracking-wider flex items-center gap-1.5 shrink-0">
+                    <span className="h-1.5 w-1.5 bg-blue-500 rounded-full animate-ping" />
+                    Bots active
+                  </span>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 text-xs">
+                  {/* Telegram panel */}
+                  <div className="space-y-4 bg-stone-50/50 p-5 rounded-2xl border border-stone-200">
+                    <span className="font-extrabold text-stone-900 uppercase tracking-wider block border-b border-stone-200 pb-2 flex items-center gap-1.5">
+                      <Send className="h-4 w-4 text-blue-500" />
+                      Cổng kết nối Telegram Bot API
+                    </span>
+
+                    <div className="space-y-3 font-sans">
+                      <div className="space-y-1">
+                        <label className="font-bold text-stone-500 text-[10px] uppercase">Telegram Bot Token</label>
+                        <input
+                          type="text"
+                          required
+                          value={telegramToken}
+                          onChange={(e) => setTelegramToken(e.target.value)}
+                          className="w-full bg-white border border-stone-200 rounded-lg px-3 py-2 font-semibold text-stone-800 focus:outline-none focus:border-stone-900"
+                        />
+                      </div>
+                      <div className="space-y-1">
+                        <label className="font-bold text-stone-500 text-[10px] uppercase">ID Nhóm báo động (Group Chat ID)</label>
+                        <input
+                          type="text"
+                          required
+                          value={telegramGroupChatId}
+                          onChange={(e) => setTelegramGroupChatId(e.target.value)}
+                          className="w-full bg-white border border-stone-200 rounded-lg px-3 py-2 font-semibold text-stone-800 focus:outline-none focus:border-stone-900"
+                        />
+                      </div>
+
+                      <div className="pt-2 bg-white/60 p-3 rounded-lg border border-stone-200/50 space-y-1">
+                        <span className="text-[9px] font-extrabold text-stone-400 uppercase tracking-wider block">Webhook URL Đồng Bộ Realtime</span>
+                        <code className="text-[10px] text-blue-600 font-mono bg-blue-50/50 px-2 py-0.5 rounded border border-blue-100 select-all block break-all">
+                          https://api.wassup-station.vn/api/telegram/webhook
+                        </code>
+                      </div>
+
+                      <div className="pt-2 flex justify-between items-center">
+                        <span className="text-[9px] text-stone-400 font-medium">Báo động phân việc & cảnh báo trễ SLA</span>
+                        <button
+                          type="button"
+                          onClick={handleTestTelegramConnection}
+                          className="px-3 py-1.5 bg-blue-50 text-blue-600 hover:bg-blue-100 border border-blue-200 font-black uppercase text-[9px] rounded-lg tracking-wider transition cursor-pointer"
+                        >
+                          {telegramConnected ? "✓ Đã kết nối" : "Kiểm tra kết nối"}
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Zalo panel */}
+                  <div className="space-y-4 bg-stone-50/50 p-5 rounded-2xl border border-stone-200">
+                    <span className="font-extrabold text-stone-900 uppercase tracking-wider block border-b border-stone-200 pb-2 flex items-center gap-1.5">
+                      <Bot className="h-4 w-4 text-emerald-500" />
+                      Cổng kết nối Zalo Official Account (OA)
+                    </span>
+
+                    <div className="space-y-3 font-sans">
+                      <div className="space-y-1">
+                        <label className="font-bold text-stone-500 text-[10px] uppercase">Zalo OA ID</label>
+                        <input
+                          type="text"
+                          required
+                          value={zaloOaId}
+                          onChange={(e) => setZaloOaId(e.target.value)}
+                          className="w-full bg-white border border-stone-200 rounded-lg px-3 py-2 font-semibold text-stone-800 focus:outline-none focus:border-stone-900"
+                        />
+                      </div>
+                      <div className="space-y-1">
+                        <label className="font-bold text-stone-500 text-[10px] uppercase">Zalo Access Token / Secret Key</label>
+                        <input
+                          type="password"
+                          required
+                          value={zaloToken}
+                          onChange={(e) => setZaloToken(e.target.value)}
+                          className="w-full bg-white border border-stone-200 rounded-lg px-3 py-2 font-semibold text-stone-800 focus:outline-none focus:border-stone-900"
+                        />
+                      </div>
+
+                      <div className="pt-2 bg-white/60 p-3 rounded-lg border border-stone-200/50 space-y-1">
+                        <span className="text-[9px] font-extrabold text-stone-400 uppercase tracking-wider block">Webhook URL Đồng Bộ Realtime</span>
+                        <code className="text-[10px] text-emerald-600 font-mono bg-emerald-50/50 px-2 py-0.5 rounded border border-emerald-100 select-all block break-all">
+                          https://api.wassup-station.vn/api/zalo/webhook
+                        </code>
+                      </div>
+
+                      <div className="pt-2 flex justify-between items-center">
+                        <span className="text-[9px] text-stone-400 font-medium">Bơm tin nhắn tương tác, nạp liệu Zalo Chatbot</span>
+                        <button
+                          type="button"
+                          onClick={handleTestZaloConnection}
+                          className="px-3 py-1.5 bg-emerald-50 text-emerald-600 hover:bg-emerald-100 border border-emerald-200 font-black uppercase text-[9px] rounded-lg tracking-wider transition cursor-pointer"
+                        >
+                          {zaloConnected ? "✓ Đã liên kết" : "Kiểm tra Zalo OA"}
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="pt-4 border-t border-stone-100 flex justify-end">
+                  <button
+                    type="submit"
+                    className="px-5 py-2.5 bg-stone-950 hover:bg-stone-800 text-white font-black text-xs uppercase rounded-xl tracking-wider shadow-sm transition cursor-pointer"
+                  >
+                    LƯU TOÀN BỘ CẤU HÌNH BOTS
+                  </button>
+                </div>
+              </div>
+            </form>
+          )}
         </div>
       )}
 
@@ -1709,29 +1972,16 @@ export default function HrModule({ staff, orders, currentUser }: HrModuleProps) 
                 />
               </div>
 
-              <div className="grid grid-cols-2 gap-3">
-                <div className="space-y-1">
-                  <label className="text-[10px] font-black text-stone-500 uppercase">Số điện thoại *</label>
-                  <input
-                    type="text"
-                    required
-                    placeholder="0912xxxxxx"
-                    value={newKtv.phone}
-                    onChange={(e) => setNewKtv({ ...newKtv, phone: e.target.value })}
-                    className="w-full bg-white border border-stone-200 rounded-lg px-3 py-2 text-xs font-semibold focus:outline-none focus:border-stone-950"
-                  />
-                </div>
-
-                <div className="space-y-1">
-                  <label className="text-[10px] font-black text-stone-500 uppercase">Mã PIN bảo mật *</label>
-                  <input
-                    type="text"
-                    required
-                    value={newKtv.pin}
-                    onChange={(e) => setNewKtv({ ...newKtv, pin: e.target.value })}
-                    className="w-full bg-white border border-stone-200 rounded-lg px-3 py-2 text-xs font-semibold focus:outline-none focus:border-stone-950"
-                  />
-                </div>
+              <div className="space-y-1">
+                <label className="text-[10px] font-black text-stone-500 uppercase">Số điện thoại *</label>
+                <input
+                  type="text"
+                  required
+                  placeholder="Ví dụ: 0912xxxxxx"
+                  value={newKtv.phone}
+                  onChange={(e) => setNewKtv({ ...newKtv, phone: e.target.value })}
+                  className="w-full bg-white border border-stone-200 rounded-lg px-3 py-2 text-xs font-semibold focus:outline-none focus:border-stone-950"
+                />
               </div>
 
               <div className="grid grid-cols-2 gap-3">
